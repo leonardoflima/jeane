@@ -7,7 +7,6 @@ import os
 
 app = FastAPI()
 
-# Permite que o site frontend acesse o backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,63 +14,97 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Pega as chaves das variáveis de ambiente (configuradas no Vercel)
-OPENAI_KEY   = os.environ.get("OPENAI_KEY")
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+SUPABASE_URL   = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY   = os.environ.get("SUPABASE_KEY")
 
-SYSTEM_PROMPT = """Você é Jeane, uma especialista em pedagogia para Educação Infantil e Anos Iniciais do Ensino Fundamental.
+SYSTEM_PROMPT = """Você é Jeane, especialista em pedagogia para Educação Infantil e Anos Iniciais do Ensino Fundamental, com domínio profundo da BNCC, RCNEI, LDB, e dos referenciais teóricos de Vygotsky, Piaget e Emília Ferreiro.
 
-Sua função é criar atividades pedagógicas fundamentadas, prontas para uso em sala de aula.
+Sua função é criar atividades pedagógicas prontas para aplicação imediata em sala de aula — no nível de qualidade de uma professora experiente com pós-graduação em educação infantil.
 
 REGRAS OBRIGATÓRIAS:
-1. Use APENAS os trechos do [CONTEXTO] para fundamentar a atividade. Não invente referências.
-2. Se o contexto não tiver informação suficiente, diga claramente quais partes não puderam ser fundamentadas.
-3. Cite sempre a fonte (nome do documento) ao referenciar algo do contexto.
-4. Adapte a linguagem para ser prática e direta — o professor deve conseguir aplicar a atividade no mesmo dia.
+1. Use APENAS os trechos do [CONTEXTO] para fundamentar. Não invente referências.
+2. Cite OBRIGATORIAMENTE o código do objetivo de aprendizagem da BNCC (ex: EI03EO01) quando disponível no contexto.
+3. Cite o Campo de Experiência da BNCC correspondente.
+4. Mencione ao menos um referencial teórico (Vygotsky, Piaget, Emília Ferreiro) com o conceito específico que embasa a atividade.
+5. O desenvolvimento deve ser tão detalhado que qualquer professora consiga aplicar sem dúvidas.
+6. Adapte rigorosamente para a faixa etária — linguagem, tempo de atenção, capacidade motora e cognitiva.
+7. Inclua falas sugeridas da professora nos momentos-chave da atividade.
+8. Se o contexto não tiver fundamentação suficiente para algum campo, indique claramente.
 
-FORMATO OBRIGATÓRIO DA RESPOSTA:
+FORMATO OBRIGATÓRIO:
 
 ## 🎯 Objetivo Pedagógico
-[O que as crianças vão desenvolver com essa atividade]
+[Descreva com precisão o que as crianças vão desenvolver, usando linguagem pedagógica]
 
 ## 📋 Materiais Necessários
-[Lista de materiais]
+[Lista completa e específica — quantidades quando possível]
 
 ## ⏱️ Tempo Estimado
-[Duração sugerida]
+[Distribuído por etapa]
+
+## 🗂️ Campo de Experiência (BNCC)
+[Nome do campo + código(s) do(s) objetivo(s) de aprendizagem]
 
 ## 📌 Desenvolvimento
-[Passo a passo detalhado da atividade]
+[Mínimo 4 etapas detalhadas com tempo de cada uma. Inclua falas sugeridas da professora entre aspas]
 
-## 👀 O que observar (Avaliação)
-[O que o professor deve observar em cada criança durante a atividade]
+## 👀 O que observar (Avaliação Formativa)
+[Indicadores específicos por criança — o que registrar, o que sinaliza desenvolvimento, o que sinaliza dificuldade]
 
-## 📚 Fundamentação
-[Referência ao documento e trecho que embasou a atividade]
+## 📚 Fundamentação Teórica
+[Cite o documento, o conceito teórico e o autor. Ex: "Conforme Vygotsky (Formação Social da Mente), a ZDP indica que... O RCNEI vol.2 orienta que..."]
 
-## 💡 Sugestão de Registro
-[Como o professor pode registrar e documentar essa atividade]"""
+## 💡 Adaptações e Variações
+[Como adaptar para crianças com dificuldades, para turmas maiores/menores, ou para continuar o tema na aula seguinte]
+
+## 📷 Sugestão de Registro
+[Como documentar para o portfólio e para o relatório do aluno]"""
 
 
 class PedidoAtividade(BaseModel):
     pedido: str
     faixa_etaria: str
+    tema_mes: str = ""
+    recursos: str = ""
+    objetivo_especifico: str = ""
+    tamanho_turma: str = ""
 
 
-def buscar_contexto(pedido: str, client: OpenAI, supabase):
-    resposta = client.embeddings.create(
-        model="text-embedding-ada-002",
-        input=pedido
-    )
-    embedding = resposta.data[0].embedding
+def buscar_contexto_rico(pedido: str, faixa: str, tema: str, client: OpenAI, supabase):
+    """Busca separada em BNCC, teóricos e RCNEI para montar contexto mais rico."""
+    
+    # Query principal
+    query_principal = f"{pedido} {faixa} {tema}".strip()
+    
+    # Query específica para BNCC
+    query_bncc = f"objetivos aprendizagem desenvolvimento {pedido} {faixa}"
+    
+    # Query para teóricos
+    query_teorico = f"desenvolvimento infantil {pedido} criança {faixa}"
 
-    resultado = supabase.rpc("buscar_documentos", {
-        "query_embedding": embedding,
-        "match_count": 5
-    }).execute()
+    chunks_totais = []
+    fontes_ja_incluidas = set()
 
-    return resultado.data
+    for query in [query_principal, query_bncc, query_teorico]:
+        resp = client.embeddings.create(
+            model="text-embedding-ada-002",
+            input=query
+        )
+        embedding = resp.data[0].embedding
+
+        resultado = supabase.rpc("buscar_documentos", {
+            "query_embedding": embedding,
+            "match_count": 4
+        }).execute()
+
+        for chunk in resultado.data:
+            chave = chunk["conteudo"][:100]
+            if chave not in fontes_ja_incluidas:
+                fontes_ja_incluidas.add(chave)
+                chunks_totais.append(chunk)
+
+    return chunks_totais[:10]
 
 
 def montar_contexto(chunks):
@@ -84,19 +117,32 @@ def montar_contexto(chunks):
     return contexto
 
 
-def gerar_atividade(pedido: str, faixa_etaria: str, contexto: str, client: OpenAI):
-    mensagem = f"""[CONTEXTO - use apenas essas informações para fundamentar a atividade]
+def gerar_atividade(dados: "PedidoAtividade", contexto: str, client: OpenAI):
+    
+    detalhes = f"""Pedido do professor: {dados.pedido}
+Faixa etária: {dados.faixa_etaria}"""
+    
+    if dados.tema_mes:
+        detalhes += f"\nTema do mês: {dados.tema_mes}"
+    if dados.objetivo_especifico:
+        detalhes += f"\nObjetivo específico: {dados.objetivo_especifico}"
+    if dados.recursos:
+        detalhes += f"\nRecursos disponíveis: {dados.recursos}"
+    if dados.tamanho_turma:
+        detalhes += f"\nTamanho da turma: {dados.tamanho_turma}"
+
+    mensagem = f"""[CONTEXTO — use apenas essas informações para fundamentar]
 {contexto}
 [FIM DO CONTEXTO]
 
-Pedido do professor: {pedido}
-Faixa etária: {faixa_etaria}
+{detalhes}
 
-Crie a atividade seguindo o formato do sistema."""
+Crie a atividade no nível de qualidade que uma professora experiente com pós-graduação aprovaria e aplicaria hoje."""
 
     resposta = client.chat.completions.create(
         model="gpt-4o",
-        max_tokens=2000,
+        max_tokens=3000,
+        temperature=0.4,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": mensagem}
@@ -113,12 +159,14 @@ def raiz():
 @app.post("/gerar-atividade")
 def endpoint_atividade(dados: PedidoAtividade):
     try:
-        client = OpenAI(api_key=OPENAI_KEY)
+        client = OpenAI(api_key=OPENAI_API_KEY)
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-        chunks = buscar_contexto(dados.pedido, client, supabase)
+        chunks = buscar_contexto_rico(
+            dados.pedido, dados.faixa_etaria, dados.tema_mes, client, supabase
+        )
         contexto = montar_contexto(chunks)
-        atividade = gerar_atividade(dados.pedido, dados.faixa_etaria, contexto, client)
+        atividade = gerar_atividade(dados, contexto, client)
 
         return {"atividade": atividade}
 
