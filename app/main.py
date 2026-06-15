@@ -18,60 +18,62 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 SUPABASE_URL   = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY   = os.environ.get("SUPABASE_KEY")
 
+# Mapeamento faixa etária → prefixo BNCC
+MAPA_BNCC = {
+    "Bercario": "EI01",
+    "Maternal I": "EI02",
+    "Maternal II": "EI02",
+    "Pre I": "EI03",
+    "Pre II": "EI03",
+    "1 ano EF": "EF01",
+    "2 ano EF": "EF02",
+    "3 ano EF": "EF03",
+    "4 ano EF": "EF04",
+    "5 ano EF": "EF05",
+}
+
+def get_prefixo_bncc(faixa: str) -> str:
+    for chave, prefixo in MAPA_BNCC.items():
+        if chave.lower() in faixa.lower():
+            return prefixo
+    return "EF01"
+
 SYSTEM_PROMPT = """Você é Jeane, especialista em pedagogia para Educação Infantil e Anos Iniciais do Ensino Fundamental, com domínio profundo da BNCC, RCNEI, LDB, e dos referenciais teóricos de Vygotsky, Piaget e Emília Ferreiro.
 
 Sua função é criar atividades pedagógicas prontas para aplicação imediata — no nível de qualidade de uma professora experiente com pós-graduação em educação infantil.
 
 ═══════════════════════════════════════════
-REFERÊNCIA OBRIGATÓRIA — CAMPOS E CÓDIGOS
+REGRAS ABSOLUTAS — NUNCA VIOLE
 ═══════════════════════════════════════════
-
-EDUCAÇÃO INFANTIL (0 a 5 anos) — use APENAS códigos EI:
-Campos de Experiência:
-• O eu, o outro e o nós → EI01EO, EI02EO, EI03EO
-• Corpo, gestos e movimentos → EI01CG, EI02CG, EI03CG
-• Traços, sons, cores e formas → EI01TS, EI02TS, EI03TS
-• Escuta, fala, pensamento e imaginação → EI01EF, EI02EF, EI03EF
-• Espaços, tempos, quantidades, relações e transformações → EI01ET, EI02ET, EI03ET
-
-Prefixos por faixa:
-• EI01 = bebês (0 a 1 ano e 6 meses)
-• EI02 = crianças bem pequenas (1 ano e 7 meses a 3 anos e 11 meses)
-• EI03 = crianças pequenas (4 anos a 5 anos e 11 meses)
-
-ENSINO FUNDAMENTAL ANOS INICIAIS (1º ao 5º ano) — use APENAS códigos EF:
-Componentes Curriculares principais:
-• Língua Portuguesa → EF01LP, EF02LP, EF03LP, EF04LP, EF05LP
-• Matemática → EF01MA, EF02MA, EF03MA, EF04MA, EF05MA
-• Ciências → EF01CI, EF02CI, EF03CI, EF04CI, EF05CI
-• Arte → EF01AR, EF02AR, EF03AR, EF04AR, EF05AR
-• Educação Física → EF01EF, EF02EF, EF03EF, EF04EF, EF05EF
-
-REGRA ABSOLUTA: NUNCA misture códigos EI com EF. Se a faixa etária for EI, use APENAS códigos EI. Se for EF, use APENAS códigos EF.
+1. Use APENAS os trechos do [CONTEXTO BNCC], [CONTEXTO TEÓRICO] e [CONTEXTO RCNEI] para fundamentar.
+2. NUNCA invente códigos BNCC. Use APENAS os códigos que aparecem literalmente nos trechos do [CONTEXTO BNCC].
+3. Se não encontrar o código exato no contexto, escreva: "Código BNCC não localizado no contexto disponível — verificar manualmente."
+4. NUNCA misture códigos EI com EF. A faixa etária determina qual série de códigos usar.
+5. Em atividades de escrita/leitura, cite OBRIGATORIAMENTE Emília Ferreiro com o nível de escrita correto para a faixa etária.
+6. O desenvolvimento deve ser tão detalhado que qualquer professora consiga aplicar sem dúvidas.
+7. Inclua falas sugeridas da professora entre aspas nos momentos-chave.
 
 ═══════════════════════════════════════════
-REFERÊNCIA — EMÍLIA FERREIRO (obrigatório em atividades de leitura/escrita)
+NÍVEIS DE ESCRITA — EMÍLIA FERREIRO
+(use para calibrar atividades de leitura/escrita)
 ═══════════════════════════════════════════
-Níveis de escrita (Psicogênese da Língua Escrita):
-• Pré-silábico: a criança não estabelece relação entre letras e sons. Escreve aleatoriamente.
-• Silábico: cada letra representa uma sílaba. Pode ser sem ou com valor sonoro.
-• Silábico-alfabético: transição — mistura critério silábico e alfabético.
-• Alfabético: compreende que cada fonema corresponde a uma letra. Ainda pode ter erros ortográficos.
-
-Quando a atividade envolver escrita ou leitura, OBRIGATORIAMENTE:
-1. Identifique o nível de escrita esperado para a faixa etária
-2. Adapte a proposta para esse nível
-3. Cite Emília Ferreiro com o conceito específico
+• Pré-silábico: não relaciona letras a sons. Típico de EI (3-5 anos).
+• Silábico sem valor sonoro: usa letras mas sem correspondência fonética. Final da EI.
+• Silábico com valor sonoro: cada letra representa uma sílaba. Início do 1º ano EF.
+• Silábico-alfabético: transição. Meio do 1º ano EF.
+• Alfabético: compreende fonemas. Final do 1º ano / início do 2º ano EF.
 
 ═══════════════════════════════════════════
-REGRAS OBRIGATÓRIAS
+CABEÇALHO OBRIGATÓRIO DO PLANEJAMENTO
 ═══════════════════════════════════════════
-1. Use APENAS os trechos do [CONTEXTO] para fundamentar. Não invente referências.
-2. Cite OBRIGATORIAMENTE o código correto do objetivo BNCC para a faixa etária informada.
-3. O desenvolvimento deve ser tão detalhado que qualquer professora consiga aplicar sem dúvidas.
-4. Inclua falas sugeridas da professora entre aspas nos momentos-chave.
-5. Adapte rigorosamente para a faixa etária — linguagem, tempo de atenção, capacidade motora e cognitiva.
-6. Se o contexto não tiver fundamentação suficiente para algum campo, indique claramente.
+Sempre inicie a atividade com este bloco antes de qualquer seção:
+
+**Professor(a):** [deixar em branco para preenchimento]
+**Turma:** [faixa etária informada]
+**Data:** [deixar em branco]
+**Componente Curricular / Campo de Experiência:** [baseado no contexto BNCC]
+**Habilidade BNCC:** [código exato do contexto — NUNCA invente]
+**Tempo total:** [soma de todas as etapas]
 
 ═══════════════════════════════════════════
 FORMATO OBRIGATÓRIO
@@ -81,28 +83,28 @@ FORMATO OBRIGATÓRIO
 [Descreva com precisão o que as crianças vão desenvolver]
 
 ## 📋 Materiais Necessários
-[Lista completa e específica com quantidades]
+[Lista completa com quantidades baseadas no tamanho da turma]
 
 ## ⏱️ Tempo Estimado
-[Distribuído por etapa]
+[Distribuído por etapa com minutos específicos]
 
 ## 🗂️ Campo de Experiência / Componente Curricular (BNCC)
-[Nome exato do campo ou componente + código(s) do(s) objetivo(s) — use a tabela de referência acima]
+[Nome exato + código(s) retirados LITERALMENTE do contexto BNCC fornecido]
 
 ## 📌 Desenvolvimento
-[Mínimo 4 etapas com tempo. Inclua falas sugeridas da professora entre aspas]
+[Mínimo 4 etapas detalhadas com tempo. Inclua falas sugeridas entre aspas. A sequência deve ter progressão pedagógica real — cada etapa avança sobre a anterior]
 
 ## 👀 O que observar (Avaliação Formativa)
-[Indicadores específicos por criança — o que registrar, o que sinaliza desenvolvimento, o que sinaliza dificuldade]
+[Indicadores específicos: o que sinaliza desenvolvimento, o que sinaliza dificuldade, o que registrar por criança]
 
 ## 📚 Fundamentação Teórica
-[Cite o documento do contexto + o conceito teórico + o autor. Em atividades de escrita/leitura, cite obrigatoriamente Emília Ferreiro com o nível de escrita correspondente]
+[Cite trecho real do contexto + conceito do autor. Em escrita/leitura: cite Emília Ferreiro com nível específico para a faixa etária]
 
 ## 💡 Adaptações e Variações
-[Como adaptar para crianças com dificuldades, turmas maiores/menores, e continuação na próxima aula]
+[Adaptação para dificuldades, turmas grandes, e proposta de continuidade na próxima aula]
 
 ## 📷 Sugestão de Registro
-[Como documentar para o portfólio e para o relatório do aluno]"""
+[Como documentar para portfólio e relatório individual do aluno]"""
 
 
 class PedidoAtividade(BaseModel):
@@ -114,47 +116,67 @@ class PedidoAtividade(BaseModel):
     tamanho_turma: str = ""
 
 
-def buscar_contexto_rico(pedido: str, faixa: str, tema: str, client: OpenAI, supabase):
-    query_principal = f"{pedido} {faixa} {tema}".strip()
-    query_bncc = f"objetivos aprendizagem desenvolvimento {pedido} {faixa}"
-    query_teorico = f"desenvolvimento infantil {pedido} crianca {faixa}"
+def buscar_por_fonte(query: str, filtro_fonte: str, match_count: int,
+                     client: OpenAI, supabase) -> list:
+    resp = client.embeddings.create(
+        model="text-embedding-ada-002",
+        input=query
+    )
+    embedding = resp.data[0].embedding
 
-    chunks_totais = []
-    fontes_ja_incluidas = set()
+    resultado = supabase.rpc("buscar_por_fonte", {
+        "query_embedding": embedding,
+        "filtro_fonte": filtro_fonte,
+        "match_count": match_count
+    }).execute()
 
-    for query in [query_principal, query_bncc, query_teorico]:
-        resp = client.embeddings.create(
-            model="text-embedding-ada-002",
-            input=query
-        )
-        embedding = resp.data[0].embedding
-
-        resultado = supabase.rpc("buscar_documentos", {
-            "query_embedding": embedding,
-            "match_count": 4
-        }).execute()
-
-        for chunk in resultado.data:
-            chave = chunk["conteudo"][:100]
-            if chave not in fontes_ja_incluidas:
-                fontes_ja_incluidas.add(chave)
-                chunks_totais.append(chunk)
-
-    return chunks_totais[:10]
+    return resultado.data or []
 
 
-def montar_contexto(chunks):
-    if not chunks:
-        return "Nenhum trecho relevante encontrado."
-    contexto = ""
-    for i, chunk in enumerate(chunks, 1):
-        contexto += f"\n[Trecho {i} — Fonte: {chunk['fonte']}]\n"
-        contexto += chunk['conteudo'] + "\n"
-    return contexto
+def buscar_contexto_estruturado(dados, client: OpenAI, supabase) -> dict:
+    prefixo = get_prefixo_bncc(dados.faixa_etaria)
+    query_base = f"{dados.pedido} {dados.faixa_etaria} {dados.tema_mes}".strip()
+    query_bncc = f"{prefixo} objetivos aprendizagem {dados.pedido}"
+
+    # Busca direcionada por fonte
+    chunks_bncc     = buscar_por_fonte(query_bncc, "BNCC", 4, client, supabase)
+    chunks_rcnei    = buscar_por_fonte(query_base, "rcnei", 3, client, supabase)
+    chunks_vygotsky = buscar_por_fonte(query_base, "VYGOTSKY", 2, client, supabase)
+    chunks_piaget   = buscar_por_fonte(query_base, "Piaget", 2, client, supabase)
+    chunks_ferreiro = buscar_por_fonte(query_base, "ferreiro", 2, client, supabase)
+
+    return {
+        "bncc": chunks_bncc,
+        "rcnei": chunks_rcnei,
+        "teoricos": chunks_vygotsky + chunks_piaget + chunks_ferreiro
+    }
 
 
-def gerar_atividade(dados, contexto: str, client: OpenAI):
-    detalhes = f"Pedido do professor: {dados.pedido}\nFaixa etária: {dados.faixa_etaria}"
+def montar_contexto_estruturado(contextos: dict, prefixo: str) -> str:
+    ctx = f"[PREFIXO BNCC PARA ESTA FAIXA ETÁRIA: {prefixo}]\n\n"
+
+    ctx += "[CONTEXTO BNCC — use APENAS os códigos que aparecem aqui]\n"
+    if contextos["bncc"]:
+        for i, c in enumerate(contextos["bncc"], 1):
+            ctx += f"[BNCC {i}] {c['conteudo']}\n"
+    else:
+        ctx += "Nenhum trecho BNCC encontrado para esta busca.\n"
+
+    ctx += "\n[CONTEXTO RCNEI]\n"
+    if contextos["rcnei"]:
+        for i, c in enumerate(contextos["rcnei"], 1):
+            ctx += f"[RCNEI {i}] {c['conteudo']}\n"
+
+    ctx += "\n[CONTEXTO TEÓRICO — Vygotsky, Piaget, Emília Ferreiro]\n"
+    if contextos["teoricos"]:
+        for i, c in enumerate(contextos["teoricos"], 1):
+            ctx += f"[TEÓRICO {i} — {c['fonte']}] {c['conteudo']}\n"
+
+    return ctx
+
+
+def gerar_atividade(dados, contexto: str, client: OpenAI) -> str:
+    detalhes = f"Pedido: {dados.pedido}\nFaixa etária: {dados.faixa_etaria}"
     if dados.tema_mes:
         detalhes += f"\nTema do mês: {dados.tema_mes}"
     if dados.objetivo_especifico:
@@ -164,20 +186,21 @@ def gerar_atividade(dados, contexto: str, client: OpenAI):
     if dados.tamanho_turma:
         detalhes += f"\nTamanho da turma: {dados.tamanho_turma}"
 
-    mensagem = f"""[CONTEXTO — use apenas essas informações para fundamentar]
-{contexto}
-[FIM DO CONTEXTO]
+    mensagem = f"""{contexto}
 
 {detalhes}
 
-ATENÇÃO: Verifique a faixa etária informada e use APENAS os códigos BNCC correspondentes conforme a tabela de referência. Nunca misture códigos EI com EF.
-
-Crie a atividade no nível que uma professora experiente com pós-graduação aprovaria e aplicaria hoje."""
+INSTRUÇÕES FINAIS:
+- Use APENAS os códigos BNCC que aparecem literalmente no [CONTEXTO BNCC] acima.
+- Se não encontrar o código, declare isso explicitamente — nunca invente.
+- Inclua o cabeçalho obrigatório antes das seções.
+- A atividade deve ter progressão pedagógica real entre as etapas.
+- Nível de qualidade: uma coordenadora experiente deve aprovar sem ressalvas."""
 
     resposta = client.chat.completions.create(
         model="gpt-4o",
-        max_tokens=3000,
-        temperature=0.3,
+        max_tokens=3500,
+        temperature=0.2,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": mensagem}
@@ -197,10 +220,9 @@ def endpoint_atividade(dados: PedidoAtividade):
         client = OpenAI(api_key=OPENAI_API_KEY)
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-        chunks = buscar_contexto_rico(
-            dados.pedido, dados.faixa_etaria, dados.tema_mes, client, supabase
-        )
-        contexto = montar_contexto(chunks)
+        prefixo = get_prefixo_bncc(dados.faixa_etaria)
+        contextos = buscar_contexto_estruturado(dados, client, supabase)
+        contexto = montar_contexto_estruturado(contextos, prefixo)
         atividade = gerar_atividade(dados, contexto, client)
 
         return {"atividade": atividade}
