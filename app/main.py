@@ -1,9 +1,9 @@
-from fastapi import FastAPI, HTTPException
+import os
+import json
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from openai import OpenAI
 from supabase import create_client
-import os
 
 app = FastAPI()
 
@@ -14,218 +14,226 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-SUPABASE_URL   = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY   = os.environ.get("SUPABASE_KEY")
+OPENAI_KEY   = os.environ.get("OPENAI_API_KEY", "")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
 
-# Mapeamento faixa etária → prefixo BNCC
-MAPA_BNCC = {
-    "Bercario": "EI01",
-    "Maternal I": "EI02",
-    "Maternal II": "EI02",
-    "Pre I": "EI03",
-    "Pre II": "EI03",
-    "1 ano EF": "EF01",
-    "2 ano EF": "EF02",
-    "3 ano EF": "EF03",
-    "4 ano EF": "EF04",
-    "5 ano EF": "EF05",
-}
+openai_client = OpenAI(api_key=OPENAI_KEY)
+supabase      = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def get_prefixo_bncc(faixa: str) -> str:
-    for chave, prefixo in MAPA_BNCC.items():
-        if chave.lower() in faixa.lower():
-            return prefixo
-    return "EF01"
+# ── HELPERS ──────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """Você é Jeane, especialista em pedagogia para Educação Infantil e Anos Iniciais do Ensino Fundamental, com domínio profundo da BNCC, RCNEI, LDB, e dos referenciais teóricos de Vygotsky, Piaget e Emília Ferreiro.
-
-Sua função é criar atividades pedagógicas prontas para aplicação imediata — no nível de qualidade de uma professora experiente com pós-graduação em educação infantil.
-
-═══════════════════════════════════════════
-REGRAS ABSOLUTAS — NUNCA VIOLE
-═══════════════════════════════════════════
-1. Use APENAS os trechos do [CONTEXTO BNCC], [CONTEXTO TEÓRICO] e [CONTEXTO RCNEI] para fundamentar.
-2. NUNCA invente códigos BNCC. Use APENAS os códigos que aparecem literalmente nos trechos do [CONTEXTO BNCC].
-3. Se não encontrar o código exato no contexto, escreva: "Código BNCC não localizado no contexto disponível — verificar manualmente."
-4. NUNCA misture códigos EI com EF. A faixa etária determina qual série de códigos usar.
-5. Em atividades de escrita/leitura, cite OBRIGATORIAMENTE Emília Ferreiro com o nível de escrita correto para a faixa etária.
-6. O desenvolvimento deve ser tão detalhado que qualquer professora consiga aplicar sem dúvidas.
-7. Inclua falas sugeridas da professora entre aspas nos momentos-chave.
-
-═══════════════════════════════════════════
-NÍVEIS DE ESCRITA — EMÍLIA FERREIRO
-(use para calibrar atividades de leitura/escrita)
-═══════════════════════════════════════════
-• Pré-silábico: não relaciona letras a sons. Típico de EI (3-5 anos).
-• Silábico sem valor sonoro: usa letras mas sem correspondência fonética. Final da EI.
-• Silábico com valor sonoro: cada letra representa uma sílaba. Início do 1º ano EF.
-• Silábico-alfabético: transição. Meio do 1º ano EF.
-• Alfabético: compreende fonemas. Final do 1º ano / início do 2º ano EF.
-
-═══════════════════════════════════════════
-CABEÇALHO OBRIGATÓRIO DO PLANEJAMENTO
-═══════════════════════════════════════════
-Sempre inicie a atividade com este bloco antes de qualquer seção:
-
-**Professor(a):** [deixar em branco para preenchimento]
-**Turma:** [faixa etária informada]
-**Data:** [deixar em branco]
-**Componente Curricular / Campo de Experiência:** [baseado no contexto BNCC]
-**Habilidade BNCC:** [código exato do contexto — NUNCA invente]
-**Tempo total:** [soma de todas as etapas]
-
-═══════════════════════════════════════════
-FORMATO OBRIGATÓRIO
-═══════════════════════════════════════════
-
-## 🎯 Objetivo Pedagógico
-[Descreva com precisão o que as crianças vão desenvolver]
-
-## 📋 Materiais Necessários
-[Lista completa com quantidades baseadas no tamanho da turma]
-
-## ⏱️ Tempo Estimado
-[Distribuído por etapa com minutos específicos]
-
-## 🗂️ Campo de Experiência / Componente Curricular (BNCC)
-[Nome exato + código(s) retirados LITERALMENTE do contexto BNCC fornecido]
-
-## 📌 Desenvolvimento
-[Mínimo 4 etapas detalhadas com tempo. Inclua falas sugeridas entre aspas. A sequência deve ter progressão pedagógica real — cada etapa avança sobre a anterior]
-
-## 👀 O que observar (Avaliação Formativa)
-[Indicadores específicos: o que sinaliza desenvolvimento, o que sinaliza dificuldade, o que registrar por criança]
-
-## 📚 Fundamentação Teórica
-[Cite trecho real do contexto + conceito do autor. Em escrita/leitura: cite Emília Ferreiro com nível específico para a faixa etária]
-
-## 💡 Adaptações e Variações
-[Adaptação para dificuldades, turmas grandes, e proposta de continuidade na próxima aula]
-
-## 📷 Sugestão de Registro
-[Como documentar para portfólio e relatório individual do aluno]"""
-
-
-class PedidoAtividade(BaseModel):
-    pedido: str
-    faixa_etaria: str
-    tema_mes: str = ""
-    recursos: str = ""
-    objetivo_especifico: str = ""
-    tamanho_turma: str = ""
-
-
-def buscar_por_fonte(query: str, filtro_fonte: str, match_count: int,
-                     client: OpenAI, supabase) -> list:
-    resp = client.embeddings.create(
+def gerar_embedding(texto: str):
+    resp = openai_client.embeddings.create(
         model="text-embedding-ada-002",
-        input=query
+        input=texto[:8000]
     )
-    embedding = resp.data[0].embedding
+    return resp.data[0].embedding
 
-    resultado = supabase.rpc("buscar_por_fonte", {
-        "query_embedding": embedding,
-        "filtro_fonte": filtro_fonte,
-        "match_count": match_count
-    }).execute()
+def buscar_chunks(embedding, match_count=5, categoria_filtro=None):
+    try:
+        if categoria_filtro:
+            result = supabase.rpc("buscar_por_fonte", {
+                "query_embedding": embedding,
+                "filtro_fonte": categoria_filtro,
+                "match_count": match_count
+            }).execute()
+        else:
+            result = supabase.rpc("buscar_documentos", {
+                "query_embedding": embedding,
+                "match_count": match_count
+            }).execute()
+        return result.data or []
+    except Exception:
+        return []
 
-    return resultado.data or []
+def buscar_por_categoria(embedding, categoria: str, match_count=4):
+    """Busca chunks filtrando pelo campo categoria (não fonte)."""
+    try:
+        result = supabase.table("documentos").select(
+            "conteudo, fonte, categoria"
+        ).eq("categoria", categoria).limit(50).execute()
 
+        # Sem busca vetorial por categoria, retorna amostra representativa
+        return result.data[:match_count] if result.data else []
+    except Exception:
+        return []
 
-def buscar_contexto_estruturado(dados, client: OpenAI, supabase) -> dict:
-    prefixo = get_prefixo_bncc(dados.faixa_etaria)
-    query_base = f"{dados.pedido} {dados.faixa_etaria} {dados.tema_mes}".strip()
-    query_bncc = f"{prefixo} objetivos aprendizagem {dados.pedido}"
-
-    # Busca direcionada por fonte
-    chunks_bncc     = buscar_por_fonte(query_bncc, "BNCC", 4, client, supabase)
-    chunks_rcnei    = buscar_por_fonte(query_base, "rcnei", 3, client, supabase)
-    chunks_vygotsky = buscar_por_fonte(query_base, "VYGOTSKY", 2, client, supabase)
-    chunks_piaget   = buscar_por_fonte(query_base, "Piaget", 2, client, supabase)
-    chunks_ferreiro = buscar_por_fonte(query_base, "ferreiro", 2, client, supabase)
-
-    return {
-        "bncc": chunks_bncc,
-        "rcnei": chunks_rcnei,
-        "teoricos": chunks_vygotsky + chunks_piaget + chunks_ferreiro
-    }
-
-
-def montar_contexto_estruturado(contextos: dict, prefixo: str) -> str:
-    ctx = f"[PREFIXO BNCC PARA ESTA FAIXA ETÁRIA: {prefixo}]\n\n"
-
-    ctx += "[CONTEXTO BNCC — use APENAS os códigos que aparecem aqui]\n"
-    if contextos["bncc"]:
-        for i, c in enumerate(contextos["bncc"], 1):
-            ctx += f"[BNCC {i}] {c['conteudo']}\n"
-    else:
-        ctx += "Nenhum trecho BNCC encontrado para esta busca.\n"
-
-    ctx += "\n[CONTEXTO RCNEI]\n"
-    if contextos["rcnei"]:
-        for i, c in enumerate(contextos["rcnei"], 1):
-            ctx += f"[RCNEI {i}] {c['conteudo']}\n"
-
-    ctx += "\n[CONTEXTO TEÓRICO — Vygotsky, Piaget, Emília Ferreiro]\n"
-    if contextos["teoricos"]:
-        for i, c in enumerate(contextos["teoricos"], 1):
-            ctx += f"[TEÓRICO {i} — {c['fonte']}] {c['conteudo']}\n"
-
-    return ctx
-
-
-def gerar_atividade(dados, contexto: str, client: OpenAI) -> str:
-    detalhes = f"Pedido: {dados.pedido}\nFaixa etária: {dados.faixa_etaria}"
-    if dados.tema_mes:
-        detalhes += f"\nTema do mês: {dados.tema_mes}"
-    if dados.objetivo_especifico:
-        detalhes += f"\nObjetivo específico: {dados.objetivo_especifico}"
-    if dados.recursos:
-        detalhes += f"\nRecursos disponíveis: {dados.recursos}"
-    if dados.tamanho_turma:
-        detalhes += f"\nTamanho da turma: {dados.tamanho_turma}"
-
-    mensagem = f"""{contexto}
-
-{detalhes}
-
-INSTRUÇÕES FINAIS:
-- Use APENAS os códigos BNCC que aparecem literalmente no [CONTEXTO BNCC] acima.
-- Se não encontrar o código, declare isso explicitamente — nunca invente.
-- Inclua o cabeçalho obrigatório antes das seções.
-- A atividade deve ter progressão pedagógica real entre as etapas.
-- Nível de qualidade: uma coordenadora experiente deve aprovar sem ressalvas."""
-
-    resposta = client.chat.completions.create(
-        model="gpt-4o",
-        max_tokens=3500,
-        temperature=0.2,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": mensagem}
-        ]
-    )
-    return resposta.choices[0].message.content
-
+# ── ENDPOINTS ────────────────────────────────────────────────
 
 @app.get("/")
-def raiz():
+def root():
     return {"status": "Jeane online"}
 
 
 @app.post("/gerar-atividade")
-def endpoint_atividade(dados: PedidoAtividade):
+async def gerar_atividade(req: Request):
+    body = await req.json()
+    pedido       = body.get("pedido", "")
+    faixa_etaria = body.get("faixa_etaria", "")
+    objetivo     = body.get("objetivo", "")
+    tema_mes     = body.get("tema_mes", "")
+    recursos     = body.get("recursos", "")
+    tamanho      = body.get("tamanho_turma", "")
+
+    if not pedido:
+        raise HTTPException(status_code=400, detail="pedido é obrigatório")
+
+    query = f"{faixa_etaria} {pedido} {objetivo}"
+    emb   = gerar_embedding(query)
+
+    bncc     = buscar_chunks(emb, match_count=3, categoria_filtro="BNCC")
+    teoricos = buscar_chunks(emb, match_count=2, categoria_filtro="VYGOTSKY")
+    rcnei    = buscar_chunks(emb, match_count=2, categoria_filtro="rcnei")
+
+    def fmt(chunks):
+        return "\n\n".join([f"[{c['fonte']}]\n{c['conteudo']}" for c in chunks]) if chunks else "Não localizado."
+
+    MAPA_FAIXA = {
+        "Berçário": {"ciclo": "Educação Infantil", "codigos": "EI01", "campo": "O eu, o outro e o nós"},
+        "G1": {"ciclo": "Educação Infantil", "codigos": "EI01", "campo": "Corpo, gestos e movimentos"},
+        "G2": {"ciclo": "Educação Infantil", "codigos": "EI02", "campo": "Traços, sons, cores e formas"},
+        "G3": {"ciclo": "Educação Infantil", "codigos": "EI02/EI03", "campo": "Escuta, fala, pensamento e imaginação"},
+        "G4": {"ciclo": "Educação Infantil — Etapa 1", "codigos": "EI03", "campo": "Espaços, tempos, quantidades, relações e transformações"},
+        "G5": {"ciclo": "Educação Infantil — Etapa 2", "codigos": "EI03", "campo": "Todos os campos de experiência"},
+        "1º ano EF": {"ciclo": "Ensino Fundamental", "codigos": "EF01", "campo": "Língua Portuguesa / Matemática"},
+        "2º ano EF": {"ciclo": "Ensino Fundamental", "codigos": "EF02", "campo": "Língua Portuguesa / Matemática"},
+        "3º ano EF": {"ciclo": "Ensino Fundamental", "codigos": "EF03", "campo": "Língua Portuguesa / Matemática / Ciências"},
+        "4º ano EF": {"ciclo": "Ensino Fundamental", "codigos": "EF04", "campo": "Todas as disciplinas"},
+        "5º ano EF": {"ciclo": "Ensino Fundamental", "codigos": "EF05", "campo": "Todas as disciplinas"},
+    }
+
+    info_faixa = MAPA_FAIXA.get(faixa_etaria, {"ciclo": faixa_etaria, "codigos": "EF/EI", "campo": ""})
+
+    system_prompt = f"""Você é Jeane, assistente pedagógica especialista em {info_faixa['ciclo']}.
+
+REGRAS ABSOLUTAS:
+1. Use SOMENTE os trechos BNCC fornecidos para citar códigos. Se não encontrar o código exato, escreva: "Verificar manualmente na BNCC — habilidade relacionada a [descreva]"
+2. Nunca invente códigos BNCC
+3. Para {faixa_etaria}: use apenas campos de experiência EI (ex: {info_faixa['campo']}) — nunca misture com componentes EF
+4. A fundamentação teórica deve citar autor, obra e conceito específico
+5. O desenvolvimento deve ter progressão real: introdução → aprofundamento → consolidação → avaliação
+
+CONTEXTO BNCC DISPONÍVEL:
+{fmt(bncc)}
+
+CONTEXTO TEÓRICO:
+{fmt(teoricos)}
+
+CONTEXTO RCNEI:
+{fmt(rcnei)}"""
+
+    user_prompt = f"""Crie um plano de atividade completo:
+
+Pedido: {pedido}
+Faixa etária / Turma: {faixa_etaria}
+{f'Objetivo específico: {objetivo}' if objetivo else ''}
+{f'Tema do mês: {tema_mes}' if tema_mes else ''}
+{f'Recursos disponíveis: {recursos}' if recursos else ''}
+{f'Tamanho da turma: {tamanho} alunos' if tamanho else ''}
+
+Estruture assim:
+## Cabeçalho
+Professor(a): [deixar em branco para preenchimento]
+Turma: {faixa_etaria}
+Data: [deixar em branco]
+Componente Curricular / Campo de Experiência: [preencher]
+Habilidade BNCC: [código ou "Verificar manualmente"]
+Tempo total: [X minutos]
+
+## 🎯 Objetivo Pedagógico
+## 📋 Materiais Necessários
+## ⏱️ Tempo Estimado
+## 🗂 Campo de Experiência / Componente Curricular (BNCC)
+## 📌 Desenvolvimento
+(com falas reais da professora entre aspas e progressão pedagógica clara)
+## 👀 O que observar (Avaliação Formativa)
+## 📚 Fundamentação Teórica
+(autor + obra + conceito específico)
+## 💡 Adaptações e Variações
+## 📷 Sugestão de Registro"""
+
+    resp = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user",   "content": user_prompt}
+        ],
+        temperature=0.5,
+        max_tokens=2000
+    )
+
+    return {"atividade": resp.choices[0].message.content}
+
+
+@app.post("/gerar-atividade-aluno")
+async def gerar_atividade_aluno(req: Request):
+    body = await req.json()
+    pedido             = body.get("pedido", "")
+    faixa_etaria       = body.get("faixa_etaria", "")
+    linhas_pontilhadas = body.get("linhas_pontilhadas", False)
+    espaco_desenho     = body.get("espaco_desenho", True)
+    tema               = body.get("tema", "")
+
+    if not pedido or not faixa_etaria:
+        raise HTTPException(status_code=400, detail="pedido e faixa_etaria são obrigatórios")
+
+    emb        = gerar_embedding(f"atividade educação infantil {faixa_etaria} {pedido}")
+    contexto   = buscar_por_categoria(emb, "atividade_ei", match_count=4)
+    ctx_txt    = "\n\n".join([c["conteudo"] for c in contexto]) if contexto else ""
+
+    system_prompt = """Você é uma especialista em Educação Infantil criando folhas de atividade para alunos.
+Retorne SOMENTE um JSON válido, sem texto antes ou depois, sem markdown, sem blocos de código.
+
+Tipos de exercício disponíveis:
+- "escrever": linhas para escrever (campo: "linhas": número)
+- "completar": itens para completar (campo: "itens": ["palavra1 ___", "palavra2 ___"])
+- "circule": opções para circular (campo: "opcoes": ["op1","op2","op3","op4"])
+- "desenho": espaço para desenhar
+- "caixa": caixa livre
+
+Regras por turma:
+- Berçário, G1, G2: apenas "desenho" e "circule"
+- G3: "desenho", "circule", "caixa"
+- G4, G5: todos os tipos
+- Gere 3 a 5 exercícios
+- Enunciados curtos e simples para crianças
+
+Formato JSON:
+{
+  "titulo": "Título curto e divertido",
+  "exercicios": [
+    {"tipo": "circule", "enunciado": "Enunciado aqui", "opcoes": ["op1","op2","op3"]},
+    {"tipo": "desenho", "enunciado": "Enunciado aqui"},
+    {"tipo": "escrever", "enunciado": "Enunciado aqui", "linhas": 2}
+  ]
+}"""
+
+    user_prompt = f"""Crie atividade para turma {faixa_etaria}.
+Tema: {pedido}
+{f'Tema do mês: {tema}' if tema else ''}
+{'Incluir linhas pontilhadas para escrita.' if linhas_pontilhadas else ''}
+
+Referência pedagógica:
+{ctx_txt if ctx_txt else 'Use seu conhecimento pedagógico.'}
+
+Retorne apenas o JSON."""
+
     try:
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-        prefixo = get_prefixo_bncc(dados.faixa_etaria)
-        contextos = buscar_contexto_estruturado(dados, client, supabase)
-        contexto = montar_contexto_estruturado(contextos, prefixo)
-        atividade = gerar_atividade(dados, contexto, client)
-
-        return {"atividade": atividade}
-
+        resp = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1200
+        )
+        texto = resp.choices[0].message.content.strip()
+        texto = texto.replace("```json", "").replace("```", "").strip()
+        dados = json.loads(texto)
+        return dados
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"Erro JSON: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
