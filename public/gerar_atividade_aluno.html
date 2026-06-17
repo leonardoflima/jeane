@@ -3,379 +3,377 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Atividade — Educação Infantil</title>
+<title>Jeane — Atividade para o Aluno</title>
 <style>
-  /* ── RESET & BASE ── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #F7F5F2;
-    color: #1a1a1a;
-    min-height: 100vh;
-  }
+:root {
+  --verde: #2D6A4F;
+  --verde-mid: #40916C;
+  --verde-claro: #B7E4C7;
+  --creme: #F8F4EE;
+  --borda: #E0DAD2;
+  --texto: #1A1A1A;
+  --texto-soft: #5C5C5C;
+  --branco: #FFFFFF;
+}
 
-  /* ── TELA DO PROFESSOR (formulário) ── */
-  .app {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--creme);
+  color: var(--texto);
+  min-height: 100vh;
+}
 
-  .app-header {
-    margin-bottom: 36px;
-  }
+/* ── FORMULÁRIO ── */
+.tela-form {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
 
-  .app-header h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #2D6A4F;
-    margin-bottom: 6px;
-  }
+.form-header { margin-bottom: 32px; }
+.form-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--verde); margin-bottom: 6px; }
+.form-header p { color: var(--texto-soft); font-size: 0.9rem; }
 
-  .app-header p {
-    color: #666;
-    font-size: 0.95rem;
-  }
+.card {
+  background: var(--branco);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
+  border: 1px solid var(--borda);
+}
 
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
+.card-titulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--verde);
+  margin-bottom: 16px;
+}
 
-  .card h2 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #2D6A4F;
-    margin-bottom: 18px;
-  }
+.campo { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.campo label { font-size: 0.85rem; font-weight: 600; color: #444; }
+.campo input, .campo select, .campo textarea {
+  padding: 10px 12px;
+  border: 1.5px solid var(--borda);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: var(--creme);
+  color: var(--texto);
+  transition: border-color 0.2s;
+}
+.campo input:focus, .campo select:focus, .campo textarea:focus {
+  outline: none; border-color: var(--verde); background: var(--branco);
+}
+.campo textarea { resize: vertical; min-height: 80px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-  .field-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
+.toggle-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-top: 1px solid var(--borda);
+}
+.toggle-row:first-child { border-top: none; padding-top: 0; }
+.toggle-label { font-size: 0.85rem; color: #444; }
 
-  .field-group.full { grid-template-columns: 1fr; }
+.toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: #CCC; border-radius: 22px; cursor: pointer; transition: background 0.2s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; left: 3px; top: 3px;
+  background: white; border-radius: 50%; transition: transform 0.2s;
+}
+.toggle input:checked + .toggle-slider { background: var(--verde); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #444;
-  }
+.btn-gerar {
+  width: 100%; padding: 15px;
+  background: var(--verde); color: white; border: none;
+  border-radius: 12px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; margin-top: 8px;
+}
+.btn-gerar:hover { background: var(--verde-mid); }
+.btn-gerar:disabled { background: #9CC5B2; cursor: not-allowed; }
 
-  input, select, textarea {
-    padding: 10px 12px;
-    border: 1.5px solid #E0DDD8;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    background: #FAFAF9;
-    color: #1a1a1a;
-    transition: border-color 0.2s;
-    width: 100%;
-  }
+.status-msg {
+  text-align: center; padding: 14px;
+  color: var(--verde); font-size: 0.9rem; display: none;
+}
 
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #2D6A4F;
-    background: #fff;
-  }
+/* ── FOLHA DO ALUNO ── */
+#tela-folha { display: none; }
 
-  textarea { resize: vertical; min-height: 90px; }
+.folha-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
 
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 0;
-    border-top: 1px solid #F0EDE8;
-    margin-top: 4px;
-  }
+.acoes {
+  display: flex; gap: 12px; margin-bottom: 20px;
+}
 
-  .toggle-label {
-    font-size: 0.9rem;
-    color: #444;
-  }
+.btn-acao {
+  flex: 1; padding: 12px; border: none; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+}
+.btn-voltar { background: var(--borda); color: #444; }
+.btn-voltar:hover { background: #ccc; }
+.btn-imprimir { background: var(--verde); color: white; }
+.btn-imprimir:hover { background: var(--verde-mid); }
 
-  .toggle {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    flex-shrink: 0;
-  }
+/* ── A FOLHA ── */
+.folha {
+  background: white;
+  border-left: 8px solid transparent;
+  border-image: linear-gradient(
+    to bottom,
+    #E53935 0%, #E53935 10%,
+    #F9A825 10%, #F9A825 20%,
+    #43A047 20%, #43A047 30%,
+    #1E88E5 30%, #1E88E5 40%,
+    #8E24AA 40%, #8E24AA 50%,
+    #E53935 50%, #E53935 60%,
+    #F9A825 60%, #F9A825 70%,
+    #43A047 70%, #43A047 80%,
+    #1E88E5 80%, #1E88E5 90%,
+    #8E24AA 90%, #8E24AA 100%
+  ) 1;
+  border-right: 8px solid transparent;
+  border-image-slice: 1;
+  padding: 28px 32px 28px 28px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
 
-  .toggle input { opacity: 0; width: 0; height: 0; }
+/* Cabeçalho da folha */
+.folha-cabecalho {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 3px solid var(--verde);
+}
 
-  .toggle-slider {
-    position: absolute;
-    inset: 0;
-    background: #D0CCC6;
-    border-radius: 24px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
+.cab-escola { display: flex; flex-direction: column; gap: 2px; }
+.cab-escola-nome {
+  font-size: 0.85rem; font-weight: 700; color: var(--texto);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.cab-escola-sub { font-size: 0.72rem; color: var(--texto-soft); }
 
-  .toggle-slider::before {
-    content: '';
-    position: absolute;
-    width: 18px; height: 18px;
-    left: 3px; top: 3px;
-    background: white;
-    border-radius: 50%;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
+.cab-badge {
+  background: var(--verde);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 7px 18px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
 
-  .toggle input:checked + .toggle-slider { background: #2D6A4F; }
-  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+/* Campos do aluno */
+.campos-aluno {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px 20px;
+  margin-bottom: 20px;
+}
 
-  .btn-gerar {
-    width: 100%;
-    padding: 16px;
-    background: #2D6A4F;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin-top: 8px;
-  }
+.campo-aluno { display: flex; flex-direction: column; gap: 3px; }
+.campo-aluno-label {
+  font-size: 0.63rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: #AAA;
+}
+.campo-aluno-linha {
+  border-bottom: 1.5px solid #333;
+  height: 22px;
+}
 
-  .btn-gerar:hover { background: #245C43; }
-  .btn-gerar:active { transform: scale(0.99); }
-  .btn-gerar:disabled { background: #9CC5B2; cursor: not-allowed; }
+/* Título da atividade */
+.atividade-titulo-box {
+  background: #F0FAF4;
+  border: 2px solid var(--verde);
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+  margin-bottom: 22px;
+}
 
-  .status {
-    text-align: center;
-    padding: 16px;
-    color: #2D6A4F;
-    font-size: 0.9rem;
-    display: none;
-  }
+.atividade-titulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--verde);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
-  /* ── FOLHA DO ALUNO (para impressão) ── */
-  #folha-aluno {
-    display: none;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
+/* Exercícios */
+.exercicio {
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+}
 
-  .folha {
-    background: white;
-    border: 1.5px solid #D0CCC6;
-    border-radius: 4px;
-    padding: 36px 40px;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-  }
+.exercicio-header {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 8px;
+}
 
-  /* Cabeçalho da folha */
-  .folha-cabecalho {
-    border-bottom: 2px solid #2D6A4F;
-    padding-bottom: 16px;
-    margin-bottom: 24px;
-  }
+.exercicio-num {
+  background: var(--verde);
+  color: white;
+  min-width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 700;
+  flex-shrink: 0;
+}
 
-  .folha-cabecalho .titulo-atividade {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #2D6A4F;
-    margin-bottom: 14px;
-  }
+.exercicio-enunciado {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--texto);
+  line-height: 1.45;
+  padding-top: 3px;
+}
 
-  .campos-aluno {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 10px 20px;
-  }
+/* Áreas de resposta */
+.linha-escrita {
+  border-bottom: 1.5px solid #999;
+  height: 36px;
+  margin-bottom: 6px;
+}
 
-  .campo-linha {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+.linha-pontilhada {
+  border-bottom: 1.5px dashed #999;
+  height: 36px;
+  margin-bottom: 6px;
+}
 
-  .campo-linha span {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #888;
-  }
+.caixa-resposta {
+  border: 1.5px solid #CCC;
+  border-radius: 10px;
+  min-height: 70px;
+  margin-top: 8px;
+}
 
-  .campo-linha .linha {
-    border-bottom: 1.5px solid #1a1a1a;
-    height: 24px;
-    width: 100%;
-  }
+.caixa-desenho {
+  border: 1.5px solid #CCC;
+  border-radius: 10px;
+  min-height: 110px;
+  display: flex; align-items: center; justify-content: center;
+  color: #DDD; font-size: 0.75rem;
+  margin-top: 8px;
+}
 
-  /* Conteúdo gerado */
-  .folha-conteudo {
-    line-height: 1.7;
-  }
+.opcoes-circule {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-top: 10px;
+}
 
-  .folha-conteudo h3 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #2D6A4F;
-    margin: 22px 0 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+.opcao-item {
+  border: 2px solid #CCC;
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  min-width: 60px;
+  text-align: center;
+  font-weight: 500;
+}
 
-  .folha-conteudo p {
-    font-size: 0.95rem;
-    color: #222;
-    margin-bottom: 10px;
-  }
+.item-completar {
+  display: flex; align-items: baseline; gap: 8px;
+  margin-bottom: 8px;
+}
 
-  /* Espaço para resposta */
-  .espaco-resposta {
-    margin: 10px 0 18px;
-  }
+.item-completar-texto {
+  font-size: 0.9rem;
+  min-width: 140px;
+  font-weight: 500;
+}
 
-  .linha-resposta {
-    border-bottom: 1.5px solid #CCC;
-    height: 32px;
-    margin-bottom: 6px;
-    width: 100%;
-  }
+.item-completar-linha {
+  flex: 1;
+  border-bottom: 1.5px solid #999;
+  height: 28px;
+}
 
-  .linha-pontilhada {
-    border-bottom: 1.5px dashed #BBB;
-    height: 32px;
-    margin-bottom: 6px;
-    width: 100%;
-  }
+/* Separador entre exercícios */
+.separador {
+  border: none;
+  border-top: 1px dashed #E0DDD8;
+  margin: 4px 0 16px;
+}
 
-  .caixa-resposta {
-    border: 1.5px solid #CCC;
-    border-radius: 6px;
-    min-height: 80px;
-    width: 100%;
-    margin-bottom: 10px;
-  }
+/* Desenho livre */
+.secao-desenho-livre {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1.5px dashed #C8E6C9;
+}
 
-  .caixa-desenho {
-    border: 1.5px solid #CCC;
-    border-radius: 6px;
-    min-height: 120px;
-    width: 100%;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #CCC;
-    font-size: 0.8rem;
-  }
+.secao-desenho-titulo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--verde);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
-  /* Exercícios */
-  .exercicio {
-    background: #F9F8F6;
-    border-left: 3px solid #2D6A4F;
-    border-radius: 0 8px 8px 0;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-  }
+.caixa-desenho-livre {
+  border: 1.5px solid #CCC;
+  border-radius: 10px;
+  min-height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  color: #DDD; font-size: 0.75rem;
+}
 
-  .exercicio .enunciado {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 10px;
-  }
+/* Rodapé */
+.folha-rodape {
+  margin-top: 22px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borda);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #CCC;
+}
 
-  /* Ícones SVG decorativos */
-  .icone-secao {
-    display: inline-block;
-    width: 22px;
-    height: 22px;
-    vertical-align: middle;
-  }
-
-  /* Rodapé da folha */
-  .folha-rodape {
-    margin-top: 28px;
-    padding-top: 12px;
-    border-top: 1px solid #E0DDD8;
-    font-size: 0.75rem;
-    color: #AAA;
-    text-align: right;
-  }
-
-  /* Botões pós-geração */
-  .acoes-folha {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-  }
-
-  .btn-acao {
-    flex: 1;
-    padding: 13px;
-    border: none;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .btn-imprimir {
-    background: #2D6A4F;
-    color: white;
-  }
-
-  .btn-imprimir:hover { background: #245C43; }
-
-  .btn-voltar {
-    background: #F0EDE8;
-    color: #444;
-  }
-
-  .btn-voltar:hover { background: #E5E0D8; }
-
-  /* ── IMPRESSÃO ── */
-  @media print {
-    body { background: white; }
-    .app, .acoes-folha { display: none !important; }
-    #folha-aluno { display: block !important; padding: 0; }
-    .folha { border: none; padding: 20px; }
-  }
+/* ── IMPRESSÃO ── */
+@media print {
+  body { background: white; }
+  .tela-form, .acoes { display: none !important; }
+  #tela-folha { display: block !important; }
+  .folha-wrapper { padding: 0; max-width: 100%; }
+  .folha { border-left-width: 8px; border-right-width: 8px; }
+  @page { margin: 8mm; }
+}
 </style>
 </head>
 <body>
 
-<!-- FORMULÁRIO DO PROFESSOR -->
-<div class="app" id="tela-formulario">
-  <div class="app-header">
-    <h1>✏️ Criar Atividade para o Aluno</h1>
+<!-- FORMULÁRIO -->
+<div class="tela-form" id="tela-form">
+  <div class="form-header">
+    <h1>Criar Atividade para o Aluno</h1>
     <p>Educação Infantil — folha pronta para imprimir</p>
   </div>
 
   <div class="card">
-    <h2>Sobre a Atividade</h2>
-    <div class="field-group full">
-      <label>
-        O que você quer trabalhar com os alunos?
-        <textarea id="pedido" placeholder="Ex: Identificar cores primárias usando frutas, trabalhar o nome próprio com tampinhas, sequência numérica de 1 a 5..."></textarea>
-      </label>
+    <div class="card-titulo">Sobre a Atividade</div>
+    <div class="campo">
+      <label>O que você quer trabalhar com os alunos?</label>
+      <textarea id="pedido" placeholder="Ex: Identificar cores primárias, reconhecer o nome próprio com tampinhas, sequência numérica de 1 a 5..."></textarea>
     </div>
-    <div class="field-group" style="margin-top:14px">
-      <label>
-        Turma
+    <div class="grid-2">
+      <div class="campo">
+        <label>Turma</label>
         <select id="turma">
           <option value="">Selecione...</option>
           <option value="Berçário">Berçário (0-1 ano)</option>
@@ -385,29 +383,33 @@
           <option value="G4">G4 — Etapa 1 (4 anos)</option>
           <option value="G5">G5 — Etapa 2 (5 anos)</option>
         </select>
-      </label>
-      <label>
-        Tema / Projeto do Mês (opcional)
-        <input type="text" id="tema" placeholder="Ex: Família, Natureza, Animais...">
-      </label>
+      </div>
+      <div class="campo">
+        <label>Tema do Mês (opcional)</label>
+        <input type="text" id="tema" placeholder="Ex: Família, Natureza...">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Nome da Escola (opcional)</label>
+      <input type="text" id="escola" placeholder="Ex: EMEI Girassol">
     </div>
   </div>
 
   <div class="card">
-    <h2>Formato da Folha</h2>
+    <div class="card-titulo">Formato da Folha</div>
     <div class="toggle-row">
       <label class="toggle">
         <input type="checkbox" id="linhas-pontilhadas">
         <span class="toggle-slider"></span>
       </label>
-      <span class="toggle-label">Incluir linhas pontilhadas para escrita (ativar para G4 e G5)</span>
+      <span class="toggle-label">Linhas pontilhadas para escrita (G4 e G5)</span>
     </div>
     <div class="toggle-row">
       <label class="toggle">
         <input type="checkbox" id="espaco-desenho" checked>
         <span class="toggle-slider"></span>
       </label>
-      <span class="toggle-label">Incluir espaço para desenho livre</span>
+      <span class="toggle-label">Espaço para desenho livre ao final</span>
     </div>
     <div class="toggle-row">
       <label class="toggle">
@@ -418,36 +420,30 @@
     </div>
   </div>
 
-  <button class="btn-gerar" id="btn-gerar" onclick="gerarAtividade()">
-    Gerar Atividade
-  </button>
-  <div class="status" id="status">✨ Criando a atividade, aguarde...</div>
+  <button class="btn-gerar" id="btn-gerar" onclick="gerarAtividade()">Gerar Atividade</button>
+  <div class="status-msg" id="status">Criando a atividade, aguarde...</div>
 </div>
 
 <!-- FOLHA DO ALUNO -->
-<div id="folha-aluno">
-  <div class="folha" id="conteudo-folha">
-    <!-- preenchido via JS -->
-  </div>
-  <div class="acoes-folha">
-    <button class="btn-acao btn-voltar" onclick="voltarFormulario()">← Criar outra</button>
-    <button class="btn-acao btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+<div id="tela-folha">
+  <div class="folha-wrapper">
+    <div class="acoes">
+      <button class="btn-acao btn-voltar" onclick="voltarForm()">← Criar outra</button>
+      <button class="btn-acao btn-imprimir" onclick="window.print()">Imprimir / Salvar PDF</button>
+    </div>
+    <div class="folha" id="folha-conteudo"></div>
   </div>
 </div>
 
 <script>
-const API_URL = "https://jeane-one.vercel.app";
+const API = "https://jeane-one.vercel.app";
 
 async function gerarAtividade() {
   const pedido = document.getElementById('pedido').value.trim();
   const turma  = document.getElementById('turma').value;
+  if (!pedido || !turma) { alert('Preencha o que quer trabalhar e selecione a turma.'); return; }
 
-  if (!pedido || !turma) {
-    alert('Preencha o que quer trabalhar e selecione a turma.');
-    return;
-  }
-
-  const btn = document.getElementById('btn-gerar');
+  const btn    = document.getElementById('btn-gerar');
   const status = document.getElementById('status');
   btn.disabled = true;
   status.style.display = 'block';
@@ -455,15 +451,14 @@ async function gerarAtividade() {
   const linhasPontilhadas = document.getElementById('linhas-pontilhadas').checked;
   const espacoDesenho     = document.getElementById('espaco-desenho').checked;
   const campoNome         = document.getElementById('campo-nome').checked;
+  const escola            = document.getElementById('escola').value.trim();
 
   try {
-    // Chama o backend para gerar o conteúdo
-    const resp = await fetch(`${API_URL}/gerar-atividade-aluno`, {
+    const resp = await fetch(`${API}/gerar-atividade-aluno`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pedido,
-        faixa_etaria: turma,
+        pedido, faixa_etaria: turma,
         linhas_pontilhadas: linhasPontilhadas,
         espaco_desenho: espacoDesenho,
         tema: document.getElementById('tema').value.trim()
@@ -471,61 +466,68 @@ async function gerarAtividade() {
     });
 
     const data = await resp.json();
-
     if (data.erro) throw new Error(data.erro);
 
-    renderizarFolha(data, { turma, linhasPontilhadas, espacoDesenho, campoNome });
+    renderFolha(data, { turma, linhasPontilhadas, espacoDesenho, campoNome, escola });
 
-  } catch (e) {
+  } catch(e) {
     alert('Erro ao gerar: ' + e.message);
     btn.disabled = false;
     status.style.display = 'none';
   }
 }
 
-function renderizarFolha(data, opts) {
-  const tipoLinha = opts.linhasPontilhadas ? 'linha-pontilhada' : 'linha-resposta';
+function renderFolha(data, opts) {
+  const tipoLinha = opts.linhasPontilhadas ? 'linha-pontilhada' : 'linha-escrita';
+  const hoje = new Date().toLocaleDateString('pt-BR');
 
-  // Cabeçalho
-  let cabecalho = '';
+  let cabHtml = '';
   if (opts.campoNome) {
-    cabecalho = `
+    const nomeEscola = opts.escola || 'Atividade Pedagógica';
+    cabHtml = `
       <div class="folha-cabecalho">
-        <div class="titulo-atividade">${data.titulo || 'Atividade'}</div>
-        <div class="campos-aluno">
-          <div class="campo-linha">
-            <span>Nome do Aluno(a)</span>
-            <div class="linha"></div>
-          </div>
-          <div class="campo-linha">
-            <span>Data</span>
-            <div class="linha"></div>
-          </div>
-          <div class="campo-linha">
-            <span>Professora</span>
-            <div class="linha"></div>
-          </div>
-          <div class="campo-linha">
-            <span>Turma</span>
-            <div class="linha"></div>
-          </div>
+        <div class="cab-escola">
+          <span class="cab-escola-nome">${nomeEscola}</span>
+          <span class="cab-escola-sub">Educação Infantil</span>
+        </div>
+        <div class="cab-badge">${opts.turma}</div>
+      </div>
+      <div class="campos-aluno">
+        <div class="campo-aluno">
+          <span class="campo-aluno-label">Nome do Aluno(a)</span>
+          <div class="campo-aluno-linha"></div>
+        </div>
+        <div class="campo-aluno">
+          <span class="campo-aluno-label">Data</span>
+          <div class="campo-aluno-linha"></div>
+        </div>
+        <div class="campo-aluno">
+          <span class="campo-aluno-label">Professora</span>
+          <div class="campo-aluno-linha"></div>
+        </div>
+        <div class="campo-aluno">
+          <span class="campo-aluno-label">Turma</span>
+          <div class="campo-aluno-linha"></div>
         </div>
       </div>`;
   }
 
-  // Exercícios
-  let exerciciosHtml = '';
+  const tituloHtml = `
+    <div class="atividade-titulo-box">
+      <div class="atividade-titulo">${data.titulo || 'Atividade'}</div>
+    </div>`;
+
+  let exercHtml = '';
   if (data.exercicios && Array.isArray(data.exercicios)) {
     data.exercicios.forEach((ex, i) => {
       let respostaHtml = '';
 
-      switch (ex.tipo) {
+      switch(ex.tipo) {
         case 'escrever':
-          const nLinhas = ex.linhas || 3;
-          for (let l = 0; l < nLinhas; l++) {
-            respostaHtml += `<div class="${tipoLinha}"></div>`;
-          }
-          respostaHtml = `<div class="espaco-resposta">${respostaHtml}</div>`;
+          const n = ex.linhas || 3;
+          let linhas = '';
+          for (let l = 0; l < n; l++) linhas += `<div class="${tipoLinha}"></div>`;
+          respostaHtml = `<div style="margin-top:8px">${linhas}</div>`;
           break;
 
         case 'caixa':
@@ -533,68 +535,72 @@ function renderizarFolha(data, opts) {
           break;
 
         case 'desenho':
-          respostaHtml = `<div class="caixa-desenho">✏️ Desenhe aqui</div>`;
+          respostaHtml = `<div class="caixa-desenho">Desenhe aqui</div>`;
           break;
 
         case 'completar':
-          respostaHtml = `<div class="espaco-resposta">
-            ${ex.itens ? ex.itens.map(item =>
-              `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">
-                <span style="font-size:0.9rem;min-width:120px">${item}</span>
-                <div class="${tipoLinha}" style="flex:1"></div>
-              </div>`
-            ).join('') : `<div class="${tipoLinha}"></div>`}
-          </div>`;
+          // Mostra apenas os espaços, sem revelar as letras certas
+          const itens = ex.itens || [];
+          respostaHtml = `<div style="margin-top:8px">${itens.map(it => {
+            // Remove qualquer gabarito entre parênteses ou após dois pontos
+            const limpo = it.replace(/\(.*?\)/g, '').replace(/:\s*.+$/, '').trim();
+            return `<div class="item-completar">
+              <span class="item-completar-texto">${limpo}</span>
+              <div class="item-completar-linha"></div>
+            </div>`;
+          }).join('')}</div>`;
           break;
 
         case 'circule':
-          respostaHtml = `<div style="display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 14px">
-            ${ex.opcoes ? ex.opcoes.map(op =>
-              `<div style="border:2px solid #CCC;border-radius:8px;padding:8px 16px;font-size:0.95rem">${op}</div>`
-            ).join('') : ''}
-          </div>`;
+          const opcoes = ex.opcoes || [];
+          respostaHtml = `<div class="opcoes-circule">${opcoes.map(op =>
+            `<div class="opcao-item">${op}</div>`
+          ).join('')}</div>`;
           break;
 
         default:
           respostaHtml = `<div class="caixa-resposta"></div>`;
       }
 
-      exerciciosHtml += `
+      exercHtml += `
         <div class="exercicio">
-          <div class="enunciado">${i + 1}. ${ex.enunciado}</div>
+          <div class="exercicio-header">
+            <div class="exercicio-num">${i+1}</div>
+            <div class="exercicio-enunciado">${ex.enunciado}</div>
+          </div>
           ${respostaHtml}
-        </div>`;
+        </div>
+        ${i < data.exercicios.length - 1 ? '<hr class="separador">' : ''}`;
     });
   }
 
-  // Espaço de desenho livre no final
-  let desenhoLivre = '';
+  let desenhoLivreHtml = '';
   if (opts.espacoDesenho) {
-    desenhoLivre = `
-      <div style="margin-top:20px">
-        <div style="font-size:0.85rem;font-weight:600;color:#2D6A4F;margin-bottom:8px">
-          🎨 Desenhe o que você aprendeu hoje!
-        </div>
-        <div class="caixa-desenho" style="min-height:140px">✏️ Espaço para desenho livre</div>
+    desenhoLivreHtml = `
+      <div class="secao-desenho-livre">
+        <div class="secao-desenho-titulo">Desenhe o que você aprendeu hoje!</div>
+        <div class="caixa-desenho-livre">Espaço para desenho livre</div>
       </div>`;
   }
 
-  // Rodapé
-  const hoje = new Date().toLocaleDateString('pt-BR');
-  const rodape = `<div class="folha-rodape">${opts.turma} · ${hoje}</div>`;
+  const rodapeHtml = `
+    <div class="folha-rodape">
+      <span>${opts.escola || 'Educação Infantil'}</span>
+      <span>${opts.turma} · ${hoje}</span>
+    </div>`;
 
-  document.getElementById('conteudo-folha').innerHTML =
-    cabecalho +
-    `<div class="folha-conteudo">${exerciciosHtml}${desenhoLivre}</div>` +
-    rodape;
+  document.getElementById('folha-conteudo').innerHTML =
+    cabHtml + tituloHtml +
+    `<div>${exercHtml}</div>` +
+    desenhoLivreHtml + rodapeHtml;
 
-  document.getElementById('tela-formulario').style.display = 'none';
-  document.getElementById('folha-aluno').style.display = 'block';
+  document.getElementById('tela-form').style.display = 'none';
+  document.getElementById('tela-folha').style.display = 'block';
 }
 
-function voltarFormulario() {
-  document.getElementById('tela-formulario').style.display = 'block';
-  document.getElementById('folha-aluno').style.display = 'none';
+function voltarForm() {
+  document.getElementById('tela-form').style.display = 'block';
+  document.getElementById('tela-folha').style.display = 'none';
   document.getElementById('btn-gerar').disabled = false;
   document.getElementById('status').style.display = 'none';
 }
