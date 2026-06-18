@@ -6,370 +6,153 @@
 <title>Jeane — Atividade para o Aluno</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --verde: #2D6A4F;
-  --verde-mid: #40916C;
-  --verde-claro: #B7E4C7;
-  --creme: #F8F4EE;
-  --borda: #E0DAD2;
-  --texto: #1A1A1A;
-  --texto-soft: #5C5C5C;
-  --branco: #FFFFFF;
+  --verde: #2D6A4F; --verde-mid: #40916C; --creme: #F8F4EE;
+  --borda: #E0DAD2; --texto: #1A1A1A; --texto-soft: #5C5C5C; --branco: #FFFFFF;
 }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--creme); color: var(--texto); min-height: 100vh; }
 
-body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  background: var(--creme);
-  color: var(--texto);
-  min-height: 100vh;
-}
-
-/* ── FORMULÁRIO ── */
-.tela-form {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
+/* FORMULÁRIO */
+.tela-form { max-width: 680px; margin: 0 auto; padding: 40px 24px; }
 .form-header { margin-bottom: 32px; }
 .form-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--verde); margin-bottom: 6px; }
 .form-header p { color: var(--texto-soft); font-size: 0.9rem; }
-
-.card {
-  background: var(--branco);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 16px;
-  border: 1px solid var(--borda);
-}
-
-.card-titulo {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--verde);
-  margin-bottom: 16px;
-}
-
+.card { background: var(--branco); border-radius: 16px; padding: 24px; margin-bottom: 16px; border: 1px solid var(--borda); }
+.card-titulo { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--verde); margin-bottom: 16px; }
 .campo { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
 .campo label { font-size: 0.85rem; font-weight: 600; color: #444; }
 .campo input, .campo select, .campo textarea {
-  padding: 10px 12px;
-  border: 1.5px solid var(--borda);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-family: inherit;
-  background: var(--creme);
-  color: var(--texto);
-  transition: border-color 0.2s;
+  padding: 10px 12px; border: 1.5px solid var(--borda); border-radius: 8px;
+  font-size: 0.9rem; font-family: inherit; background: var(--creme); color: var(--texto); transition: border-color 0.2s;
 }
-.campo input:focus, .campo select:focus, .campo textarea:focus {
-  outline: none; border-color: var(--verde); background: var(--branco);
-}
+.campo input:focus, .campo select:focus, .campo textarea:focus { outline: none; border-color: var(--verde); background: var(--branco); }
 .campo textarea { resize: vertical; min-height: 80px; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-.toggle-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 0; border-top: 1px solid var(--borda);
-}
+.qtd-selector { display: flex; gap: 8px; margin-top: 4px; }
+.qtd-btn { width: 44px; height: 44px; border: 2px solid var(--borda); border-radius: 10px; background: var(--creme); font-size: 1rem; font-weight: 700; color: #666; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.qtd-btn:hover { border-color: var(--verde-mid); color: var(--verde); }
+.qtd-btn.ativo { border-color: var(--verde); background: var(--verde); color: white; }
+.toggle-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--borda); }
 .toggle-row:first-child { border-top: none; padding-top: 0; }
 .toggle-label { font-size: 0.85rem; color: #444; }
-
 .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute; inset: 0;
-  background: #CCC; border-radius: 22px; cursor: pointer; transition: background 0.2s;
-}
-.toggle-slider::before {
-  content: ''; position: absolute;
-  width: 16px; height: 16px; left: 3px; top: 3px;
-  background: white; border-radius: 50%; transition: transform 0.2s;
-}
+.toggle-slider { position: absolute; inset: 0; background: #CCC; border-radius: 22px; cursor: pointer; transition: background 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
 .toggle input:checked + .toggle-slider { background: var(--verde); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
-
-.btn-gerar {
-  width: 100%; padding: 15px;
-  background: var(--verde); color: white; border: none;
-  border-radius: 12px; font-size: 1rem; font-weight: 700;
-  cursor: pointer; transition: background 0.2s; margin-top: 8px;
-}
+.btn-gerar { width: 100%; padding: 15px; background: var(--verde); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
 .btn-gerar:hover { background: var(--verde-mid); }
 .btn-gerar:disabled { background: #9CC5B2; cursor: not-allowed; }
+.status-msg { text-align: center; padding: 14px; color: var(--verde); font-size: 0.9rem; display: none; }
+.debug-panel { background: #1a1a2e; color: #00ff88; font-family: monospace; font-size: 0.72rem; padding: 16px; border-radius: 10px; margin: 12px 0; max-height: 280px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; display: none; }
+.debug-toggle { font-size: 0.75rem; color: var(--texto-soft); cursor: pointer; text-decoration: underline; text-align: center; display: block; margin-top: 8px; }
 
-.status-msg {
-  text-align: center; padding: 14px;
-  color: var(--verde); font-size: 0.9rem; display: none;
-}
-
-/* ── FOLHA DO ALUNO ── */
+/* FOLHA */
 #tela-folha { display: none; }
-
-.folha-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.acoes {
-  display: flex; gap: 12px; margin-bottom: 20px;
-}
-
-.btn-acao {
-  flex: 1; padding: 12px; border: none; border-radius: 10px;
-  font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
-}
+.folha-wrapper { max-width: 800px; margin: 0 auto; padding: 24px; }
+.acoes { display: flex; gap: 12px; margin-bottom: 20px; }
+.btn-acao { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.2s; }
 .btn-voltar { background: var(--borda); color: #444; }
 .btn-voltar:hover { background: #ccc; }
 .btn-imprimir { background: var(--verde); color: white; }
 .btn-imprimir:hover { background: var(--verde-mid); }
 
-/* ── A FOLHA ── */
 .folha {
   background: white;
   border-left: 8px solid transparent;
-  border-image: linear-gradient(
-    to bottom,
-    #E53935 0%, #E53935 10%,
-    #F9A825 10%, #F9A825 20%,
-    #43A047 20%, #43A047 30%,
-    #1E88E5 30%, #1E88E5 40%,
-    #8E24AA 40%, #8E24AA 50%,
-    #E53935 50%, #E53935 60%,
-    #F9A825 60%, #F9A825 70%,
-    #43A047 70%, #43A047 80%,
-    #1E88E5 80%, #1E88E5 90%,
-    #8E24AA 90%, #8E24AA 100%
-  ) 1;
-  border-right: 8px solid transparent;
-  border-image-slice: 1;
+  border-image: linear-gradient(to bottom,#E53935 0%,#E53935 10%,#F9A825 10%,#F9A825 20%,#43A047 20%,#43A047 30%,#1E88E5 30%,#1E88E5 40%,#8E24AA 40%,#8E24AA 50%,#E53935 50%,#E53935 60%,#F9A825 60%,#F9A825 70%,#43A047 70%,#43A047 80%,#1E88E5 80%,#1E88E5 90%,#8E24AA 90%,#8E24AA 100%) 1;
+  border-right: 8px solid transparent; border-image-slice: 1;
   padding: 28px 32px 28px 28px;
-  font-family: 'Segoe UI', system-ui, sans-serif;
 }
-
-/* Cabeçalho da folha */
-.folha-cabecalho {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-bottom: 14px;
-  margin-bottom: 16px;
-  border-bottom: 3px solid var(--verde);
-}
-
+.folha-cabecalho { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; margin-bottom: 16px; border-bottom: 3px solid var(--verde); }
 .cab-escola { display: flex; flex-direction: column; gap: 2px; }
-.cab-escola-nome {
-  font-size: 0.85rem; font-weight: 700; color: var(--texto);
-  text-transform: uppercase; letter-spacing: 0.04em;
-}
+.cab-escola-nome { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
 .cab-escola-sub { font-size: 0.72rem; color: var(--texto-soft); }
-
-.cab-badge {
-  background: var(--verde);
-  color: white;
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 7px 18px;
-  border-radius: 20px;
-  letter-spacing: 0.03em;
-}
-
-/* Campos do aluno */
-.campos-aluno {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 8px 20px;
-  margin-bottom: 20px;
-}
-
+.cab-badge { background: var(--verde); color: white; font-size: 0.85rem; font-weight: 700; padding: 7px 18px; border-radius: 20px; }
+.campos-aluno { display: grid; grid-template-columns: 2fr 1fr; gap: 8px 20px; margin-bottom: 20px; }
 .campo-aluno { display: flex; flex-direction: column; gap: 3px; }
-.campo-aluno-label {
-  font-size: 0.63rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: #AAA;
-}
-.campo-aluno-linha {
-  border-bottom: 1.5px solid #333;
-  height: 22px;
-}
+.campo-aluno-label { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #AAA; }
+.campo-aluno-linha { border-bottom: 1.5px solid #333; height: 22px; }
+.atividade-titulo-box { background: #F0FAF4; border: 2px solid var(--verde); border-radius: 10px; padding: 10px 20px; text-align: center; margin-bottom: 22px; }
+.atividade-titulo { font-size: 1.05rem; font-weight: 700; color: var(--verde); text-transform: uppercase; letter-spacing: 0.05em; }
+.exercicio { margin-bottom: 20px; page-break-inside: avoid; }
+.exercicio-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.exercicio-num { background: var(--verde); color: white; min-width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; }
+.exercicio-enunciado { font-size: 0.92rem; font-weight: 600; color: var(--texto); line-height: 1.45; padding-top: 3px; }
+.linha-escrita { border-bottom: 1.5px solid #999; height: 36px; margin-bottom: 6px; }
+.linha-pontilhada { border-bottom: 1.5px dashed #999; height: 36px; margin-bottom: 6px; }
+.caixa-resposta { border: 1.5px solid #CCC; border-radius: 10px; min-height: 70px; margin-top: 8px; }
+.caixa-desenho { border: 1.5px solid #CCC; border-radius: 10px; min-height: 110px; display: flex; align-items: center; justify-content: center; color: #DDD; font-size: 0.75rem; margin-top: 8px; }
+.opcoes-circule { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.opcao-item { border: 2px solid #CCC; border-radius: 10px; padding: 8px 20px; font-size: 0.9rem; min-width: 60px; text-align: center; font-weight: 500; }
+.item-completar { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.item-completar-texto { font-size: 0.9rem; min-width: 140px; font-weight: 500; }
+.item-completar-linha { flex: 1; border-bottom: 1.5px solid #999; height: 28px; }
+.separador { border: none; border-top: 1px dashed #E0DDD8; margin: 4px 0 16px; }
+.secao-desenho-livre { margin-top: 22px; padding-top: 16px; border-top: 1.5px dashed #C8E6C9; }
+.secao-desenho-titulo { font-size: 0.78rem; font-weight: 700; color: var(--verde); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.caixa-desenho-livre { border: 1.5px solid #CCC; border-radius: 10px; min-height: 130px; display: flex; align-items: center; justify-content: center; color: #DDD; font-size: 0.75rem; }
+.folha-rodape { margin-top: 22px; padding-top: 10px; border-top: 1px solid var(--borda); display: flex; justify-content: space-between; font-size: 0.68rem; color: #CCC; }
 
-/* Título da atividade */
-.atividade-titulo-box {
-  background: #F0FAF4;
-  border: 2px solid var(--verde);
-  border-radius: 10px;
-  padding: 10px 20px;
-  text-align: center;
-  margin-bottom: 22px;
-}
+/* TRACEJADO */
+.tracejado-container { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; align-items: center; }
+.tracejado-char { display: flex; flex-direction: column; align-items: center; }
+.tracejado-svg { width: 70px; height: 80px; }
 
-.atividade-titulo {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--verde);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+/* FIGURAS */
+.figuras-container { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; align-items: flex-end; }
+.figura-item { display: flex; flex-direction: column; align-items: center; }
+.figura-svg { width: 72px; height: 72px; }
 
-/* Exercícios */
-.exercicio {
-  margin-bottom: 20px;
-  page-break-inside: avoid;
-}
+/* CONTAGEM */
+.contagem-container { margin-top: 10px; display: flex; flex-direction: column; gap: 16px; }
+.contagem-grupo { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.contagem-figuras { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.contagem-figura { width: 40px; height: 40px; }
+.contagem-resposta-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.contagem-resposta { border-bottom: 2px solid #555; width: 48px; height: 32px; }
+.contagem-resposta-label { font-size: 0.6rem; color: #AAA; text-transform: uppercase; }
 
-.exercicio-header {
-  display: flex; align-items: flex-start; gap: 10px;
-  margin-bottom: 8px;
-}
-
-.exercicio-num {
-  background: var(--verde);
-  color: white;
-  min-width: 26px; height: 26px;
-  border-radius: 50%;
+/* CAÇA-PALAVRAS */
+.cacapalavras-wrap { margin-top: 10px; display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+.cacapalavras-grade { display: inline-block; }
+.grade-row { display: flex; }
+.grade-cel {
+  width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.82rem; font-weight: 700;
-  flex-shrink: 0;
+  border: 1px solid #DDD;
+  font-size: 0.85rem; font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: #333;
 }
+.cacapalavras-lista { flex: 1; min-width: 120px; }
+.cacapalavras-lista-titulo { font-size: 0.72rem; font-weight: 700; color: var(--verde); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.cacapalavras-lista ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.cacapalavras-lista li { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.cacapalavras-lista li::before { content: '☐'; font-size: 1rem; color: #CCC; }
 
-.exercicio-enunciado {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--texto);
-  line-height: 1.45;
-  padding-top: 3px;
-}
-
-/* Áreas de resposta */
-.linha-escrita {
-  border-bottom: 1.5px solid #999;
-  height: 36px;
-  margin-bottom: 6px;
-}
-
-.linha-pontilhada {
-  border-bottom: 1.5px dashed #999;
-  height: 36px;
-  margin-bottom: 6px;
-}
-
-.caixa-resposta {
-  border: 1.5px solid #CCC;
-  border-radius: 10px;
-  min-height: 70px;
-  margin-top: 8px;
-}
-
-.caixa-desenho {
-  border: 1.5px solid #CCC;
-  border-radius: 10px;
-  min-height: 110px;
-  display: flex; align-items: center; justify-content: center;
-  color: #DDD; font-size: 0.75rem;
-  margin-top: 8px;
-}
-
-.opcoes-circule {
-  display: flex; flex-wrap: wrap; gap: 10px;
-  margin-top: 10px;
-}
-
-.opcao-item {
-  border: 2px solid #CCC;
-  border-radius: 10px;
-  padding: 8px 20px;
-  font-size: 0.9rem;
-  min-width: 60px;
-  text-align: center;
-  font-weight: 500;
-}
-
-.item-completar {
-  display: flex; align-items: baseline; gap: 8px;
-  margin-bottom: 8px;
-}
-
-.item-completar-texto {
-  font-size: 0.9rem;
-  min-width: 140px;
-  font-weight: 500;
-}
-
-.item-completar-linha {
-  flex: 1;
-  border-bottom: 1.5px solid #999;
-  height: 28px;
-}
-
-/* Separador entre exercícios */
-.separador {
-  border: none;
-  border-top: 1px dashed #E0DDD8;
-  margin: 4px 0 16px;
-}
-
-/* Desenho livre */
-.secao-desenho-livre {
-  margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1.5px dashed #C8E6C9;
-}
-
-.secao-desenho-titulo {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--verde);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.caixa-desenho-livre {
-  border: 1.5px solid #CCC;
-  border-radius: 10px;
-  min-height: 130px;
-  display: flex; align-items: center; justify-content: center;
-  color: #DDD; font-size: 0.75rem;
-}
-
-/* Rodapé */
-.folha-rodape {
-  margin-top: 22px;
-  padding-top: 10px;
-  border-top: 1px solid var(--borda);
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.68rem;
-  color: #CCC;
-}
-
-/* ── IMPRESSÃO ── */
 @media print {
   body { background: white; }
-  .tela-form, .acoes { display: none !important; }
+  .tela-form, .acoes, .debug-panel, .debug-toggle { display: none !important; }
   #tela-folha { display: block !important; }
   .folha-wrapper { padding: 0; max-width: 100%; }
-  .folha { border-left-width: 8px; border-right-width: 8px; }
   @page { margin: 8mm; }
 }
 </style>
 </head>
 <body>
 
-<!-- FORMULÁRIO -->
 <div class="tela-form" id="tela-form">
   <div class="form-header">
     <h1>Criar Atividade para o Aluno</h1>
     <p>Educação Infantil — folha pronta para imprimir</p>
   </div>
-
   <div class="card">
     <div class="card-titulo">Sobre a Atividade</div>
     <div class="campo">
       <label>O que você quer trabalhar com os alunos?</label>
-      <textarea id="pedido" placeholder="Ex: Identificar cores primárias, reconhecer o nome próprio com tampinhas, sequência numérica de 1 a 5..."></textarea>
+      <textarea id="pedido" placeholder="Ex: Caça-palavras com animais, números pontilhados de 1 a 5, identificar cores..."></textarea>
     </div>
     <div class="grid-2">
       <div class="campo">
@@ -394,37 +177,40 @@ body {
       <input type="text" id="escola" placeholder="Ex: EMEI Girassol">
     </div>
   </div>
-
+  <div class="card">
+    <div class="card-titulo">Quantidade de Exercícios</div>
+    <div class="campo" style="margin-bottom:0">
+      <label style="margin-bottom:8px">Quantos exercícios?</label>
+      <div class="qtd-selector">
+        <button class="qtd-btn" onclick="setQtd(2)">2</button>
+        <button class="qtd-btn" onclick="setQtd(3)">3</button>
+        <button class="qtd-btn ativo" onclick="setQtd(4)">4</button>
+        <button class="qtd-btn" onclick="setQtd(5)">5</button>
+        <button class="qtd-btn" onclick="setQtd(6)">6</button>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-titulo">Formato da Folha</div>
     <div class="toggle-row">
-      <label class="toggle">
-        <input type="checkbox" id="linhas-pontilhadas">
-        <span class="toggle-slider"></span>
-      </label>
-      <span class="toggle-label">Linhas pontilhadas para escrita (G4 e G5)</span>
+      <label class="toggle"><input type="checkbox" id="linhas-pontilhadas"><span class="toggle-slider"></span></label>
+      <span class="toggle-label">Linhas pontilhadas para escrita</span>
     </div>
     <div class="toggle-row">
-      <label class="toggle">
-        <input type="checkbox" id="espaco-desenho" checked>
-        <span class="toggle-slider"></span>
-      </label>
+      <label class="toggle"><input type="checkbox" id="espaco-desenho" checked><span class="toggle-slider"></span></label>
       <span class="toggle-label">Espaço para desenho livre ao final</span>
     </div>
     <div class="toggle-row">
-      <label class="toggle">
-        <input type="checkbox" id="campo-nome" checked>
-        <span class="toggle-slider"></span>
-      </label>
-      <span class="toggle-label">Cabeçalho com nome do aluno, data e turma</span>
+      <label class="toggle"><input type="checkbox" id="campo-nome" checked><span class="toggle-slider"></span></label>
+      <span class="toggle-label">Cabeçalho com nome, data e turma</span>
     </div>
   </div>
-
   <button class="btn-gerar" id="btn-gerar" onclick="gerarAtividade()">Gerar Atividade</button>
-  <div class="status-msg" id="status">Criando a atividade, aguarde...</div>
+  <div class="status-msg" id="status">✦ Criando a atividade, aguarde...</div>
+  <span class="debug-toggle" onclick="toggleDebug()">ver JSON da última resposta</span>
+  <div class="debug-panel" id="debug-panel"></div>
 </div>
 
-<!-- FOLHA DO ALUNO -->
 <div id="tela-folha">
   <div class="folha-wrapper">
     <div class="acoes">
@@ -437,21 +223,191 @@ body {
 
 <script>
 const API = "https://jeane-one.vercel.app";
+let qtdSelecionada = 4;
+let ultimoJSON = null;
 
+function setQtd(n) {
+  qtdSelecionada = n;
+  document.querySelectorAll('.qtd-btn').forEach(b => b.classList.toggle('ativo', parseInt(b.textContent) === n));
+}
+function toggleDebug() {
+  const p = document.getElementById('debug-panel');
+  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  p.textContent = ultimoJSON ? JSON.stringify(ultimoJSON, null, 2) : '(nenhuma resposta ainda)';
+}
+
+// ══════════════════════════════════════════════
+// FIGURAS SVG
+// ══════════════════════════════════════════════
+const FIGURAS_SVG = {
+  sol:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="22" fill="none" stroke="#888" stroke-width="3"/><line x1="50" y1="8" x2="50" y2="22" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="50" y1="78" x2="50" y2="92" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="8" y1="50" x2="22" y2="50" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="78" y1="50" x2="92" y2="50" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="21" x2="31" y2="31" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="69" y1="69" x2="79" y2="79" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="79" y1="21" x2="69" y2="31" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="79" x2="31" y2="69" stroke="#888" stroke-width="3" stroke-linecap="round"/></svg>`,
+  nuvem:`<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><path d="M20 55 Q10 55 10 45 Q10 35 20 35 Q20 22 33 22 Q38 14 50 16 Q60 14 65 22 Q78 20 80 32 Q90 32 90 44 Q90 55 78 55 Z" fill="none" stroke="#888" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  estrela:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,8 61,35 90,35 68,57 76,85 50,68 24,85 32,57 10,35 39,35" fill="none" stroke="#888" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  lua:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M60 15 Q32 28 32 50 Q32 72 60 85 Q30 85 18 62 Q8 42 20 24 Q32 8 60 15 Z" fill="none" stroke="#888" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  casa:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polyline points="10,52 50,15 90,52" fill="none" stroke="#888" stroke-width="3" stroke-linejoin="round"/><rect x="18" y="52" width="64" height="38" fill="none" stroke="#888" stroke-width="3"/><rect x="40" y="68" width="20" height="22" fill="none" stroke="#888" stroke-width="2.5"/><rect x="25" y="60" width="14" height="14" fill="none" stroke="#888" stroke-width="2.5"/><rect x="61" y="60" width="14" height="14" fill="none" stroke="#888" stroke-width="2.5"/></svg>`,
+  arvore:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="43" y="68" width="14" height="26" fill="none" stroke="#888" stroke-width="3"/><ellipse cx="50" cy="42" rx="30" ry="34" fill="none" stroke="#888" stroke-width="3"/></svg>`,
+  flor:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="44" r="10" fill="none" stroke="#888" stroke-width="2.5"/><ellipse cx="50" cy="24" rx="9" ry="12" fill="none" stroke="#888" stroke-width="2.5"/><ellipse cx="50" cy="64" rx="9" ry="12" fill="none" stroke="#888" stroke-width="2.5"/><ellipse cx="32" cy="34" rx="9" ry="12" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(-60 32 34)"/><ellipse cx="68" cy="34" rx="9" ry="12" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(60 68 34)"/><ellipse cx="32" cy="54" rx="9" ry="12" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(60 32 54)"/><ellipse cx="68" cy="54" rx="9" ry="12" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(-60 68 54)"/><line x1="50" y1="54" x2="50" y2="90" stroke="#888" stroke-width="3" stroke-linecap="round"/></svg>`,
+  folha:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 90 Q20 70 18 40 Q18 15 50 10 Q82 15 82 40 Q80 70 50 90 Z" fill="none" stroke="#888" stroke-width="3"/><line x1="50" y1="10" x2="50" y2="90" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3"/></svg>`,
+  cachorro:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="52" cy="62" rx="28" ry="20" fill="none" stroke="#888" stroke-width="3"/><circle cx="50" cy="36" r="16" fill="none" stroke="#888" stroke-width="3"/><ellipse cx="36" cy="24" rx="7" ry="10" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(-20 36 24)"/><ellipse cx="64" cy="24" rx="7" ry="10" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(20 64 24)"/><circle cx="45" cy="34" r="2.5" fill="#888"/><circle cx="55" cy="34" r="2.5" fill="#888"/><line x1="28" y1="75" x2="24" y2="92" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="38" y1="80" x2="36" y2="94" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="62" y1="80" x2="64" y2="94" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="72" y1="75" x2="76" y2="92" stroke="#888" stroke-width="3" stroke-linecap="round"/></svg>`,
+  gato:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="62" rx="26" ry="20" fill="none" stroke="#888" stroke-width="3"/><circle cx="50" cy="36" r="17" fill="none" stroke="#888" stroke-width="3"/><polygon points="34,22 30,8 42,18" fill="none" stroke="#888" stroke-width="2.5" stroke-linejoin="round"/><polygon points="66,22 70,8 58,18" fill="none" stroke="#888" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="44" cy="35" rx="3" ry="4.5" fill="#888"/><ellipse cx="56" cy="35" rx="3" ry="4.5" fill="#888"/><line x1="28" y1="75" x2="24" y2="92" stroke="#888" stroke-width="3" stroke-linecap="round"/><line x1="72" y1="75" x2="76" y2="92" stroke="#888" stroke-width="3" stroke-linecap="round"/></svg>`,
+  peixe:`<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><ellipse cx="46" cy="35" rx="30" ry="18" fill="none" stroke="#888" stroke-width="3"/><path d="M76 35 L92 20 L96 35 L92 50 Z" fill="none" stroke="#888" stroke-width="2.5" stroke-linejoin="round"/><circle cx="30" cy="30" r="3" fill="#888"/></svg>`,
+  passaro:`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><path d="M50 60 Q30 60 18 48 Q12 40 18 32 Q24 22 36 28 Q40 20 50 22 Q60 20 64 28 Q76 22 82 32 Q88 40 82 48 Q70 60 50 60 Z" fill="none" stroke="#888" stroke-width="3"/><path d="M36 28 Q44 32 50 40 Q56 32 64 28" fill="none" stroke="#888" stroke-width="2"/><circle cx="38" cy="34" r="2.5" fill="#888"/><circle cx="62" cy="34" r="2.5" fill="#888"/><line x1="42" y1="60" x2="38" y2="72" stroke="#888" stroke-width="2.5" stroke-linecap="round"/><line x1="50" y1="62" x2="50" y2="74" stroke="#888" stroke-width="2.5" stroke-linecap="round"/><line x1="58" y1="60" x2="62" y2="72" stroke="#888" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  borboleta:`<svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><ellipse cx="28" cy="28" rx="22" ry="18" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(-20 28 28)"/><ellipse cx="72" cy="28" rx="22" ry="18" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(20 72 28)"/><ellipse cx="32" cy="56" rx="16" ry="12" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(15 32 56)"/><ellipse cx="68" cy="56" rx="16" ry="12" fill="none" stroke="#888" stroke-width="2.5" transform="rotate(-15 68 56)"/><ellipse cx="50" cy="40" rx="4" ry="22" fill="none" stroke="#888" stroke-width="2.5"/></svg>`,
+  maca:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 95 Q20 90 15 65 Q10 42 30 32 Q40 27 50 32 Q60 27 70 32 Q90 42 85 65 Q80 90 50 95 Z" fill="none" stroke="#888" stroke-width="3"/><path d="M50 32 Q52 18 62 12" fill="none" stroke="#888" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+  banana:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30 85 Q15 65 20 42 Q25 22 45 15 Q60 10 72 18 L68 24 Q58 18 46 22 Q30 28 28 46 Q24 66 38 82 Z" fill="none" stroke="#888" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  morango:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 90 Q22 75 18 50 Q16 30 30 22 Q40 16 50 24 Q60 16 70 22 Q84 30 82 50 Q78 75 50 90 Z" fill="none" stroke="#888" stroke-width="3"/><circle cx="38" cy="52" r="2.5" fill="#888"/><circle cx="54" cy="44" r="2.5" fill="#888"/><circle cx="62" cy="60" r="2.5" fill="#888"/><circle cx="44" cy="68" r="2.5" fill="#888"/></svg>`,
+  coracao:`<svg viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg"><path d="M50 80 Q10 55 10 30 Q10 10 30 10 Q42 10 50 22 Q58 10 70 10 Q90 10 90 30 Q90 55 50 80 Z" fill="none" stroke="#888" stroke-width="3" stroke-linejoin="round"/></svg>`,
+  circulo:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="none" stroke="#888" stroke-width="4"/></svg>`,
+  triangulo:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,10 90,88 10,88" fill="none" stroke="#888" stroke-width="4" stroke-linejoin="round"/></svg>`,
+  quadrado:`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="12" width="76" height="76" rx="6" fill="none" stroke="#888" stroke-width="4"/></svg>`,
+};
+
+// ══════════════════════════════════════════════
+// TRACEJADO SVG
+// ══════════════════════════════════════════════
+const PATHS_DIGITOS = {
+  '0':'M30 8 Q14 8 12 28 L12 52 Q12 72 30 72 Q48 72 48 52 L48 28 Q48 8 30 8 Z',
+  '1':'M20 20 L30 12 L30 72 M18 72 L42 72',
+  '2':'M14 22 Q14 8 30 8 Q46 8 46 22 Q46 34 30 44 L14 72 L46 72',
+  '3':'M14 10 L44 10 L28 38 Q46 40 46 55 Q46 72 30 72 Q14 72 12 58',
+  '4':'M38 72 L38 10 L10 50 L52 50',
+  '5':'M44 10 L14 10 L12 38 Q18 30 30 30 Q48 30 48 52 Q48 72 30 72 Q14 72 12 60',
+  '6':'M40 12 Q16 12 14 38 L14 52 Q14 72 30 72 Q46 72 46 55 Q46 38 30 38 Q16 38 14 52',
+  '7':'M12 10 L48 10 L28 72',
+  '8':'M30 8 Q14 8 14 24 Q14 40 30 40 Q46 40 46 56 Q46 72 30 72 Q14 72 14 56 Q14 40 30 40 Q46 40 46 24 Q46 8 30 8 Z',
+  '9':'M46 28 Q46 8 30 8 Q14 8 14 28 Q14 42 30 42 Q46 42 46 28 L46 52 Q46 72 30 72',
+};
+const PATHS_LETRAS = {
+  'A':'M10 72 L30 10 L50 72 M18 50 L42 50','B':'M14 10 L14 72 M14 10 L34 10 Q48 10 48 26 Q48 40 34 40 L14 40 M14 40 L36 40 Q50 40 50 56 Q50 72 36 72 L14 72',
+  'C':'M46 18 Q38 8 26 8 Q10 8 10 40 Q10 72 26 72 Q38 72 46 62','D':'M14 10 L14 72 M14 10 L28 10 Q50 10 50 40 Q50 72 28 72 L14 72',
+  'E':'M46 10 L14 10 L14 72 L46 72 M14 40 L40 40','F':'M46 10 L14 10 L14 72 M14 40 L40 40',
+  'G':'M46 18 Q38 8 26 8 Q10 8 10 40 Q10 72 26 72 Q42 72 46 60 L46 40 L32 40','H':'M14 10 L14 72 M46 10 L46 72 M14 40 L46 40',
+  'I':'M22 10 L38 10 M30 10 L30 72 M22 72 L38 72','J':'M22 10 L38 10 M32 10 L32 56 Q32 72 20 72 Q10 72 10 62',
+  'K':'M14 10 L14 72 M46 10 L14 40 L46 72','L':'M14 10 L14 72 L46 72',
+  'M':'M10 72 L10 10 L30 50 L50 10 L50 72','N':'M14 72 L14 10 L46 72 L46 10',
+  'O':'M30 8 Q10 8 10 40 Q10 72 30 72 Q50 72 50 40 Q50 8 30 8 Z','P':'M14 10 L14 72 M14 10 L34 10 Q50 10 50 28 Q50 44 34 44 L14 44',
+  'Q':'M30 8 Q10 8 10 40 Q10 72 30 72 Q50 72 50 40 Q50 8 30 8 Z M38 58 L52 74','R':'M14 10 L14 72 M14 10 L34 10 Q50 10 50 28 Q50 44 34 44 L14 44 M34 44 L50 72',
+  'S':'M44 14 Q36 6 24 8 Q10 10 10 24 Q10 38 30 40 Q50 42 50 58 Q50 74 34 74 Q18 74 12 64','T':'M10 10 L50 10 M30 10 L30 72',
+  'U':'M14 10 L14 52 Q14 72 30 72 Q46 72 46 52 L46 10','V':'M10 10 L30 72 L50 10',
+  'W':'M8 10 L20 72 L30 40 L40 72 L52 10','X':'M12 10 L48 72 M48 10 L12 72',
+  'Y':'M10 10 L30 40 L50 10 M30 40 L30 72','Z':'M12 10 L48 10 L12 72 L48 72',
+};
+
+function gerarSVGTracejado(char) {
+  const c = String(char).trim().toUpperCase();
+  const path = /\d/.test(c) ? PATHS_DIGITOS[c] : PATHS_LETRAS[c];
+  if (!path) return `<svg class="tracejado-svg" viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg"><text x="8" y="60" font-size="52" fill="#CCC" font-family="monospace">${c}</text></svg>`;
+  const m = path.match(/M\s*([\d.]+)\s+([\d.]+)/);
+  const ponto = m ? `<circle cx="${m[1]}" cy="${m[2]}" r="4" fill="#74C69D" opacity="0.9"/>` : '';
+  return `<svg class="tracejado-svg" viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+    <line x1="4" y1="74" x2="56" y2="74" stroke="#FFCCCC" stroke-width="1.5"/>
+    <path d="${path}" fill="none" stroke="#CCCCCC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6,5"/>
+    ${ponto}</svg>`;
+}
+
+// ══════════════════════════════════════════════
+// ALGORITMO CAÇA-PALAVRAS
+// ══════════════════════════════════════════════
+function gerarCacaPalavras(palavras) {
+  // Tamanho mínimo para caber todas as palavras
+  const maxLen = Math.max(...palavras.map(p => p.length));
+  const tamanho = Math.max(maxLen + 2, Math.min(palavras.length * 2 + 2, 14));
+
+  // Inicializa grade vazia
+  const grade = Array.from({length: tamanho}, () => Array(tamanho).fill(''));
+
+  const direcoes = [
+    [0, 1],   // horizontal →
+    [1, 0],   // vertical ↓
+    [1, 1],   // diagonal ↘
+    [0, -1],  // horizontal ←
+    [-1, 0],  // vertical ↑
+  ];
+
+  function tentarEncaixar(palavra, dir) {
+    const [dr, dc] = dir;
+    // Tenta 30 posições aleatórias
+    for (let t = 0; t < 30; t++) {
+      const linhaMax = tamanho - (dr > 0 ? palavra.length : 0);
+      const colMax   = tamanho - (dc > 0 ? palavra.length : dc < 0 ? -(palavra.length-1) : 0);
+      const colMin   = dc < 0 ? palavra.length - 1 : 0;
+
+      if (linhaMax <= 0 || colMax <= colMin) continue;
+
+      const linha = Math.floor(Math.random() * Math.max(1, linhaMax));
+      const col   = colMin + Math.floor(Math.random() * Math.max(1, colMax - colMin));
+
+      // Verifica se cabe sem conflito
+      let ok = true;
+      for (let i = 0; i < palavra.length; i++) {
+        const r = linha + dr * i;
+        const c = col  + dc * i;
+        if (r < 0 || r >= tamanho || c < 0 || c >= tamanho) { ok = false; break; }
+        if (grade[r][c] !== '' && grade[r][c] !== palavra[i]) { ok = false; break; }
+      }
+      if (ok) {
+        for (let i = 0; i < palavra.length; i++) {
+          grade[linha + dr * i][col + dc * i] = palavra[i];
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Ordena palavras da maior para a menor (mais fácil encaixar)
+  const ordenadas = [...palavras].sort((a, b) => b.length - a.length);
+
+  for (const palavra of ordenadas) {
+    let encaixou = false;
+    // Tenta cada direção aleatoriamente
+    const dirs = [...direcoes].sort(() => Math.random() - 0.5);
+    for (const dir of dirs) {
+      if (tentarEncaixar(palavra, dir)) { encaixou = true; break; }
+    }
+    if (!encaixou) {
+      // Força horizontal se nada funcionou
+      tentarEncaixar(palavra, [0, 1]);
+    }
+  }
+
+  // Preenche espaços vazios com letras aleatórias
+  const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let r = 0; r < tamanho; r++)
+    for (let c = 0; c < tamanho; c++)
+      if (grade[r][c] === '') grade[r][c] = letras[Math.floor(Math.random() * letras.length)];
+
+  return grade;
+}
+
+function renderCacaPalavras(palavras) {
+  const grade = gerarCacaPalavras(palavras);
+  const linhas = grade.map(row =>
+    `<div class="grade-row">${row.map(cel => `<div class="grade-cel">${cel}</div>`).join('')}</div>`
+  ).join('');
+
+  const lista = palavras.map(p => `<li>${p}</li>`).join('');
+
+  return `<div class="cacapalavras-wrap">
+    <div class="cacapalavras-grade">${linhas}</div>
+    <div class="cacapalavras-lista">
+      <div class="cacapalavras-lista-titulo">Encontre as palavras:</div>
+      <ul>${lista}</ul>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// GERAÇÃO E RENDER
+// ══════════════════════════════════════════════
 async function gerarAtividade() {
   const pedido = document.getElementById('pedido').value.trim();
   const turma  = document.getElementById('turma').value;
   if (!pedido || !turma) { alert('Preencha o que quer trabalhar e selecione a turma.'); return; }
 
-  const btn    = document.getElementById('btn-gerar');
+  const btn = document.getElementById('btn-gerar');
   const status = document.getElementById('status');
-  btn.disabled = true;
-  status.style.display = 'block';
-
-  const linhasPontilhadas = document.getElementById('linhas-pontilhadas').checked;
-  const espacoDesenho     = document.getElementById('espaco-desenho').checked;
-  const campoNome         = document.getElementById('campo-nome').checked;
-  const escola            = document.getElementById('escola').value.trim();
+  btn.disabled = true; status.style.display = 'block';
 
   try {
     const resp = await fetch(`${API}/gerar-atividade-aluno`, {
@@ -459,140 +415,162 @@ async function gerarAtividade() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         pedido, faixa_etaria: turma,
-        linhas_pontilhadas: linhasPontilhadas,
-        espaco_desenho: espacoDesenho,
-        tema: document.getElementById('tema').value.trim()
+        linhas_pontilhadas: document.getElementById('linhas-pontilhadas').checked,
+        espaco_desenho: document.getElementById('espaco-desenho').checked,
+        tema: document.getElementById('tema').value.trim(),
+        quantidade_exercicios: qtdSelecionada
       })
     });
 
     const data = await resp.json();
-    if (data.erro) throw new Error(data.erro);
+    ultimoJSON = data;
+    const panel = document.getElementById('debug-panel');
+    if (panel.style.display === 'block') panel.textContent = JSON.stringify(data, null, 2);
+    if (data.erro || data.detail) throw new Error(data.erro || data.detail);
 
-    renderFolha(data, { turma, linhasPontilhadas, espacoDesenho, campoNome, escola });
-
+    renderFolha(data, {
+      turma,
+      linhasPontilhadas: document.getElementById('linhas-pontilhadas').checked,
+      espacoDesenho: document.getElementById('espaco-desenho').checked,
+      campoNome: document.getElementById('campo-nome').checked,
+      escola: document.getElementById('escola').value.trim()
+    });
   } catch(e) {
-    alert('Erro ao gerar: ' + e.message);
-    btn.disabled = false;
-    status.style.display = 'none';
+    alert('Erro: ' + e.message);
+    btn.disabled = false; status.style.display = 'none';
   }
 }
 
 function renderFolha(data, opts) {
   const tipoLinha = opts.linhasPontilhadas ? 'linha-pontilhada' : 'linha-escrita';
   const hoje = new Date().toLocaleDateString('pt-BR');
+  const nomeEscola = opts.escola || 'Educação Infantil';
 
   let cabHtml = '';
   if (opts.campoNome) {
-    const nomeEscola = opts.escola || 'Atividade Pedagógica';
     cabHtml = `
       <div class="folha-cabecalho">
-        <div class="cab-escola">
-          <span class="cab-escola-nome">${nomeEscola}</span>
-          <span class="cab-escola-sub">Educação Infantil</span>
-        </div>
+        <div class="cab-escola"><span class="cab-escola-nome">${nomeEscola}</span><span class="cab-escola-sub">Educação Infantil</span></div>
         <div class="cab-badge">${opts.turma}</div>
       </div>
       <div class="campos-aluno">
-        <div class="campo-aluno">
-          <span class="campo-aluno-label">Nome do Aluno(a)</span>
-          <div class="campo-aluno-linha"></div>
-        </div>
-        <div class="campo-aluno">
-          <span class="campo-aluno-label">Data</span>
-          <div class="campo-aluno-linha"></div>
-        </div>
-        <div class="campo-aluno">
-          <span class="campo-aluno-label">Professora</span>
-          <div class="campo-aluno-linha"></div>
-        </div>
-        <div class="campo-aluno">
-          <span class="campo-aluno-label">Turma</span>
-          <div class="campo-aluno-linha"></div>
-        </div>
+        <div class="campo-aluno"><span class="campo-aluno-label">Nome do Aluno(a)</span><div class="campo-aluno-linha"></div></div>
+        <div class="campo-aluno"><span class="campo-aluno-label">Data</span><div class="campo-aluno-linha"></div></div>
+        <div class="campo-aluno"><span class="campo-aluno-label">Professora</span><div class="campo-aluno-linha"></div></div>
+        <div class="campo-aluno"><span class="campo-aluno-label">Turma</span><div class="campo-aluno-linha"></div></div>
       </div>`;
   }
 
-  const tituloHtml = `
-    <div class="atividade-titulo-box">
-      <div class="atividade-titulo">${data.titulo || 'Atividade'}</div>
-    </div>`;
+  const tituloHtml = `<div class="atividade-titulo-box"><div class="atividade-titulo">${data.titulo || 'Atividade'}</div></div>`;
 
   let exercHtml = '';
-  if (data.exercicios && Array.isArray(data.exercicios)) {
-    data.exercicios.forEach((ex, i) => {
-      let respostaHtml = '';
+  (data.exercicios || []).forEach((ex, i) => {
+    let respostaHtml = '';
+    const tipo = (ex.tipo || '').toLowerCase().trim();
 
-      switch(ex.tipo) {
-        case 'escrever':
-          const n = ex.linhas || 3;
-          let linhas = '';
-          for (let l = 0; l < n; l++) linhas += `<div class="${tipoLinha}"></div>`;
-          respostaHtml = `<div style="margin-top:8px">${linhas}</div>`;
-          break;
+    switch(tipo) {
 
-        case 'caixa':
-          respostaHtml = `<div class="caixa-resposta"></div>`;
-          break;
-
-        case 'desenho':
-          respostaHtml = `<div class="caixa-desenho">Desenhe aqui</div>`;
-          break;
-
-        case 'completar':
-          // Mostra apenas os espaços, sem revelar as letras certas
-          const itens = ex.itens || [];
-          respostaHtml = `<div style="margin-top:8px">${itens.map(it => {
-            // Remove qualquer gabarito entre parênteses ou após dois pontos
-            const limpo = it.replace(/\(.*?\)/g, '').replace(/:\s*.+$/, '').trim();
-            return `<div class="item-completar">
-              <span class="item-completar-texto">${limpo}</span>
-              <div class="item-completar-linha"></div>
-            </div>`;
-          }).join('')}</div>`;
-          break;
-
-        case 'circule':
-          const opcoes = ex.opcoes || [];
-          respostaHtml = `<div class="opcoes-circule">${opcoes.map(op =>
-            `<div class="opcao-item">${op}</div>`
-          ).join('')}</div>`;
-          break;
-
-        default:
-          respostaHtml = `<div class="caixa-resposta"></div>`;
+      case 'tracejado': {
+        // Aceita "caracteres", "numeros", "letras" e faz fallback pelo enunciado
+        let chars = ex.caracteres || ex.numeros || ex.letras || [];
+        if (chars.length === 0) {
+          const m = (ex.enunciado || '').match(/(\d)\s*[aà]\s*(\d)/);
+          if (m) chars = Array.from({length: parseInt(m[2])-parseInt(m[1])+1}, (_,k) => String(parseInt(m[1])+k));
+        }
+        if (chars.length === 0) { respostaHtml = `<div class="caixa-resposta"></div>`; break; }
+        const svgs = chars.map(c => `<div class="tracejado-char">${gerarSVGTracejado(String(c))}</div>`).join('');
+        respostaHtml = `<div class="tracejado-container">${svgs}</div>`;
+        break;
       }
 
-      exercHtml += `
-        <div class="exercicio">
-          <div class="exercicio-header">
-            <div class="exercicio-num">${i+1}</div>
-            <div class="exercicio-enunciado">${ex.enunciado}</div>
-          </div>
-          ${respostaHtml}
+      case 'figura': {
+        const fig = (ex.imagem || 'estrela').toLowerCase();
+        const qtd = Math.max(1, Math.min(5, parseInt(ex.quantidade) || 1));
+        const svg = FIGURAS_SVG[fig] || FIGURAS_SVG['estrela'];
+        respostaHtml = `<div class="figuras-container">${Array(qtd).fill(0).map(() =>
+          `<div class="figura-item"><div class="figura-svg">${svg}</div></div>`).join('')}</div>`;
+        break;
+      }
+
+      case 'contagem': {
+        const grupos = ex.grupos || [];
+        if (!grupos.length) { respostaHtml = `<div class="caixa-resposta"></div>`; break; }
+        const gruposHtml = grupos.map(g => {
+          const fig = (g.imagem || 'estrela').toLowerCase();
+          const svg = FIGURAS_SVG[fig] || FIGURAS_SVG['estrela'];
+          const qtd = Math.max(1, Math.min(6, parseInt(g.quantidade) || 1));
+          const figs = Array(qtd).fill(0).map(() => `<div class="contagem-figura">${svg}</div>`).join('');
+          return `<div class="contagem-grupo">
+            <div class="contagem-figuras">${figs}</div>
+            <div class="contagem-resposta-wrap">
+              <div class="contagem-resposta"></div>
+              <div class="contagem-resposta-label">Quantos?</div>
+            </div>
+          </div>`;
+        }).join('');
+        respostaHtml = `<div class="contagem-container">${gruposHtml}</div>`;
+        break;
+      }
+
+      case 'cacapalavras': {
+        const palavras = ex.palavras || [];
+        if (!palavras.length) { respostaHtml = `<div class="caixa-resposta"></div>`; break; }
+        respostaHtml = renderCacaPalavras(palavras);
+        break;
+      }
+
+      case 'circule': {
+        const opcoes = ex.opcoes || [];
+        respostaHtml = `<div class="opcoes-circule">${opcoes.map(op => `<div class="opcao-item">${op}</div>`).join('')}</div>`;
+        break;
+      }
+
+      case 'completar': {
+        const itens = ex.itens || [];
+        respostaHtml = `<div style="margin-top:8px">${itens.map(it =>
+          `<div class="item-completar"><span class="item-completar-texto">${it}</span><div class="item-completar-linha"></div></div>`
+        ).join('')}</div>`;
+        break;
+      }
+
+      case 'escrever': {
+        const n = ex.linhas || 2;
+        respostaHtml = `<div style="margin-top:8px">${Array(n).fill(0).map(() => `<div class="${tipoLinha}"></div>`).join('')}</div>`;
+        break;
+      }
+
+      case 'desenho':
+        respostaHtml = `<div class="caixa-desenho">Desenhe aqui ✏️</div>`;
+        break;
+
+      case 'caixa':
+        respostaHtml = `<div class="caixa-resposta"></div>`;
+        break;
+
+      default:
+        console.warn('Tipo desconhecido:', tipo, ex);
+        respostaHtml = `<div class="caixa-resposta" style="display:flex;align-items:center;justify-content:center;color:#DDD;font-size:0.75rem">${tipo || 'tipo desconhecido'}</div>`;
+    }
+
+    exercHtml += `
+      <div class="exercicio">
+        <div class="exercicio-header">
+          <div class="exercicio-num">${i+1}</div>
+          <div class="exercicio-enunciado">${ex.enunciado || ''}</div>
         </div>
-        ${i < data.exercicios.length - 1 ? '<hr class="separador">' : ''}`;
-    });
-  }
+        ${respostaHtml}
+      </div>
+      ${i < (data.exercicios.length - 1) ? '<hr class="separador">' : ''}`;
+  });
 
   let desenhoLivreHtml = '';
   if (opts.espacoDesenho) {
-    desenhoLivreHtml = `
-      <div class="secao-desenho-livre">
-        <div class="secao-desenho-titulo">Desenhe o que você aprendeu hoje!</div>
-        <div class="caixa-desenho-livre">Espaço para desenho livre</div>
-      </div>`;
+    desenhoLivreHtml = `<div class="secao-desenho-livre"><div class="secao-desenho-titulo">✦ Desenhe o que você aprendeu hoje!</div><div class="caixa-desenho-livre">Espaço para desenho livre</div></div>`;
   }
 
-  const rodapeHtml = `
-    <div class="folha-rodape">
-      <span>${opts.escola || 'Educação Infantil'}</span>
-      <span>${opts.turma} · ${hoje}</span>
-    </div>`;
-
   document.getElementById('folha-conteudo').innerHTML =
-    cabHtml + tituloHtml +
-    `<div>${exercHtml}</div>` +
-    desenhoLivreHtml + rodapeHtml;
+    cabHtml + tituloHtml + `<div>${exercHtml}</div>` + desenhoLivreHtml +
+    `<div class="folha-rodape"><span>${nomeEscola}</span><span>${opts.turma} · ${hoje}</span></div>`;
 
   document.getElementById('tela-form').style.display = 'none';
   document.getElementById('tela-folha').style.display = 'block';
