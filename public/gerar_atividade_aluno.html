@@ -119,12 +119,12 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--creme);
 .cacapalavras-grade { display: inline-block; }
 .grade-row { display: flex; }
 .grade-cel {
-  width: 28px; height: 28px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  border: 1px solid #DDD;
-  font-size: 0.85rem; font-weight: 700;
+  border: 1px solid #CCC;
+  font-size: 1.05rem; font-weight: 700;
   font-family: 'Courier New', monospace;
-  color: #333;
+  color: #222;
 }
 .cacapalavras-lista { flex: 1; min-width: 120px; }
 .cacapalavras-lista-titulo { font-size: 0.72rem; font-weight: 700; color: var(--verde); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
@@ -311,7 +311,7 @@ function gerarSVGTracejado(char) {
 function gerarCacaPalavras(palavras) {
   // Tamanho mínimo para caber todas as palavras
   const maxLen = Math.max(...palavras.map(p => p.length));
-  const tamanho = Math.max(maxLen + 2, Math.min(palavras.length * 2 + 2, 14));
+  const tamanho = Math.max(maxLen + 2, Math.min(palavras.length * 2 + 1, 12));
 
   // Inicializa grade vazia
   const grade = Array.from({length: tamanho}, () => Array(tamanho).fill(''));
@@ -320,8 +320,6 @@ function gerarCacaPalavras(palavras) {
     [0, 1],   // horizontal →
     [1, 0],   // vertical ↓
     [1, 1],   // diagonal ↘
-    [0, -1],  // horizontal ←
-    [-1, 0],  // vertical ↑
   ];
 
   function tentarEncaixar(palavra, dir) {
